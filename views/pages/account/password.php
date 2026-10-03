@@ -11,6 +11,8 @@
 
     <form method="post" action="<?= e(url('/account/password')) ?>" class="card card-body space-y-5" novalidate data-validate>
         <?= csrf_field() ?>
+        <!-- Lets password managers store the new password against the right account. -->
+        <input type="email" autocomplete="username" value="<?= e(user()['email']) ?>" class="hidden" readonly tabindex="-1" aria-hidden="true">
 
         <div>
             <label for="current_password" class="label"><?= $forced ? 'Temporary password' : 'Current password' ?></label>

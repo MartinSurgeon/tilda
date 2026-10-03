@@ -107,4 +107,5 @@ INSERT INTO settings (setting_key, setting_value) VALUES
  ('org.domain',               'ruma.hospital'),
  ('tickets.ref_prefix',       'RUMA'),
  ('notifications.email',      '1'),
- ('poll.interval_seconds',    '15');
+ ('poll.interval_seconds',    '15'),
+ ('tickets.auto_close_days',  '5');

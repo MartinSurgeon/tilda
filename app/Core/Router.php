@@ -57,9 +57,29 @@ final class Router
         throw new HttpException($pathMatched ? 405 : 404);
     }
 
+    private static function postMaxBytes(): int
+    {
+        $v = trim((string) ini_get('post_max_size'));
+        $n = (int) $v;
+        return match (strtolower(substr($v, -1))) {
+            'g' => $n * 1024 ** 3,
+            'm' => $n * 1024 ** 2,
+            'k' => $n * 1024,
+            default => $n,
+        } ?: PHP_INT_MAX;
+    }
+
     private function runMiddleware(array $opt): void
     {
         $method = Request::method();
+
+        // An upload larger than post_max_size arrives with an empty $_POST (no CSRF token):
+        // explain the real problem instead of showing "form expired".
+        if ($method === 'POST' && $_POST === [] && (int) ($_SERVER['CONTENT_LENGTH'] ?? 0) > self::postMaxBytes()) {
+            Session::flash('danger', 'The files you attached are too large to send. Please attach smaller files, up to '
+                . config('uploads.max_mb') . ' MB each.');
+            Response::back('/');
+        }
 
         // CSRF applies to every state-changing request, signed in or not.
         if ($method !== 'GET' && $method !== 'HEAD' && !Csrf::verify()) {

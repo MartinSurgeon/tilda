@@ -181,6 +181,9 @@ CREATE TABLE tickets (
     first_response_at    DATETIME          NULL,
     resolved_at          DATETIME          NULL,
     closed_at            DATETIME          NULL,
+    -- SLA clock pauses while On hold: due dates are pushed back by hold time.
+    on_hold_since        DATETIME          NULL,
+    hold_minutes         INT UNSIGNED      NOT NULL DEFAULT 0,
     sla_warned_at        DATETIME          NULL,
     sla_breach_notified_at DATETIME        NULL,
     created_at           DATETIME          NOT NULL DEFAULT CURRENT_TIMESTAMP,

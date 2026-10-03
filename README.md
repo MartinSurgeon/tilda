@@ -4,9 +4,9 @@ Internal ticketing for **RUMA Hospital (ruma.hospital)**. Staff report hardware
 and software problems, the IT team resolves them, management receives monthly
 reports, and every action is recorded in a tamper-evident audit trail.
 
-> **Status: Phase 1 (Foundation) complete.** Sign-in, roles and permissions,
-> user management, layout shell and design system work. Tickets arrive in
-> Phase 2.
+> **Status: Phase 2 (Tickets) complete.** Sign-in, roles, user management,
+> ticket submission, queue, workflow, SLAs, attachments and settings work.
+> Next: Phase 3 (live dashboards, notification centre, email).
 
 - **Stack:** PHP 8.1+ (no framework), MySQL 8 / MariaDB 10.4+, Tailwind CSS (pre-built), vanilla JS
 - **Runs on:** cPanel shared hosting or any VPS. Node is only needed on a developer machine.
@@ -67,12 +67,30 @@ they need in `config/routes.php`. Hidden buttons are cosmetic only.
 | audit.export | | | | | ✓ |
 | admin.users / admin.settings | | | ✓ | | |
 
+## Ticket workflow
+
+```
+Open → Assigned → In progress ⇄ On hold → Resolved → Closed
+                                          ↘ Reopened → back into work
+```
+
+- **Technicians** take an unassigned ticket (or a manager assigns it), then start, pause, resolve.
+  They can only change tickets that are theirs or unowned; IT Managers can change any.
+- **Requesters** confirm the fix (closes it) or reopen with a reason. They can cancel an open request.
+- **SLA**: response and resolution targets per priority (*Settings → Priorities & SLA*).
+  Time *On hold* does not count. Changing priority recalculates the targets.
+- **Attachments**: JPG, PNG, WebP or PDF, up to 3 per message and `UPLOAD_MAX_MB` each.
+  Images are re-encoded (removes location data from phone photos). Files live in `storage/uploads`
+  and are only served after a permission check. Make sure PHP `upload_max_filesize` and
+  `post_max_size` are at least `UPLOAD_MAX_MB` × 3.
+
 ## Project layout
 
 ```
 app/Core         Router, Request/Response, DB (PDO), Session, Csrf, Auth, Gate, Validator, View
 app/Controllers  HTTP controllers (Admin/ for administration)
-app/Services     AuditLogger, HashChain, PasswordPolicy, Settings, TicketMeta
+app/Models       Ticket, Lookup (queries)
+app/Services     TicketService, TicketPolicy, Sla, Uploads, Notifier, AuditLogger, HashChain, …
 config/          app.php (reads .env), routes.php
 database/        schema.sql, triggers.sql, seed.sql, grants.sql, MIGRATIONS.md
 public/          index.php (single entry point) + assets: the ONLY web-served folder

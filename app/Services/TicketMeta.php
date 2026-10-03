@@ -29,6 +29,15 @@ final class TicketMeta
         return '<span class="' . $meta['badge'] . '">' . icon($meta['icon'], 'h-3.5 w-3.5') . e($meta['label']) . '</span>';
     }
 
+    public static function slaBadge(array $t): string
+    {
+        $s = Sla::state($t);
+        if ($s['state'] === 'none') {
+            return '';
+        }
+        return '<span class="' . $s['badge'] . '">' . icon($s['icon'], 'h-3.5 w-3.5') . e($s['label']) . '</span>';
+    }
+
     public static function priorityBadge(string $name, string $tone, string $icon): string
     {
         $class = self::TONES[$tone] ?? 'badge-neutral';

@@ -13,13 +13,9 @@ use App\Core\View;
 final class PlaceholderController
 {
     private const PAGES = [
-        '/tickets/create' => ['New ticket', 'ticket', 2],
-        '/tickets'        => ['Ticket queue', 'inbox', 2],
-        '/tickets/mine'   => ['My tickets', 'ticket', 2],
         '/notifications'  => ['Notifications', 'bell', 3],
         '/audit'          => ['Audit log', 'shield-check', 4],
         '/reports'        => ['Reports', 'chart', 5],
-        '/admin/settings' => ['Settings', 'settings', 2],
     ];
 
     public function show(): void

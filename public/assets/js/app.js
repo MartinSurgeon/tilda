@@ -170,19 +170,73 @@
     else input.removeAttribute('aria-describedby');
   };
 
+  /* Required radio groups (e.g. ticket category tiles). Error sits after the group. */
+  const radioGroupError = (form, name) => {
+    const radios = $$(`input[type="radio"][name="${name}"]`, form);
+    if (!radios.length || !radios[0].required) return null;
+    const fieldset = radios[0].closest('fieldset');
+    const id = `${name}-error`;
+    let el = document.getElementById(id);
+    if (radios.some((r) => r.checked)) {
+      el?.remove();
+      fieldset?.removeAttribute('aria-describedby');
+      return null;
+    }
+    if (!el) {
+      el = document.createElement('p');
+      el.id = id;
+      el.className = 'field-error';
+      el.innerHTML = `${ICON_ALERT}<span>Please choose one option.</span>`;
+      (fieldset || radios[radios.length - 1].parentElement).appendChild(el);
+    }
+    fieldset?.setAttribute('aria-describedby', id);
+    return radios[0];
+  };
+
+  /* File inputs: catch too many / too large before a slow upload. */
+  const fileError = (input) => {
+    const max = parseInt(input.dataset.maxFiles || '0', 10);
+    const bytes = parseInt(input.dataset.maxBytes || '0', 10);
+    const files = Array.from(input.files || []);
+    if (max && files.length > max) return `You can attach up to ${max} files.`;
+    const big = files.find((f) => bytes && f.size > bytes);
+    if (big) return `“${big.name}” is too large. The limit is ${Math.round(bytes / 1048576)} MB per file.`;
+    return null;
+  };
+  $$('input[type="file"][data-max-files]').forEach((input) => {
+    input.addEventListener('change', () => setError(input, fileError(input)));
+  });
+
   $$('form[data-validate]').forEach((form) => {
-    const fields = $$('input[id], select[id], textarea[id]', form).filter((f) => f.type !== 'hidden');
+    const radioNames = [...new Set($$('input[type="radio"][required]', form).map((r) => r.name))];
+    radioNames.forEach((name) => $$(`input[name="${name}"]`, form).forEach((r) => {
+      r.addEventListener('change', () => radioGroupError(form, name));
+    }));
+    form.addEventListener('submit', (e) => {
+      const firstBadRadio = radioNames.map((n) => radioGroupError(form, n)).find(Boolean);
+      const badFile = $$('input[type="file"][data-max-files]', form).find((i) => { const m = fileError(i); setError(i, m); return m; });
+      const target = firstBadRadio || badFile;
+      if (target) {
+        e.preventDefault(); // field checks below still run, so every error shows at once
+        target.focus();
+      }
+    });
+  });
+
+  $$('form[data-validate]').forEach((form) => {
+    const fields = $$('input[id], select[id], textarea[id]', form).filter((f) => f.type !== 'hidden' && f.type !== 'file');
     fields.forEach((f) => {
       // Validate on blur (not while typing) — kinder than shouting mid-word.
       f.addEventListener('blur', () => { if (f.value !== '' || f.hasAttribute('aria-invalid')) setError(f, messageFor(f)); });
       f.addEventListener('input', () => { if (f.hasAttribute('aria-invalid')) setError(f, messageFor(f)); });
     });
     form.addEventListener('submit', (e) => {
+      const focused = e.defaultPrevented;
       const invalid = fields.filter((f) => { const m = messageFor(f); setError(f, m); return m; });
       if (invalid.length) {
         e.preventDefault();
         e.stopImmediatePropagation();
-        invalid[0].focus();
+        if (!focused) invalid[0].focus();
       }
     });
   });
@@ -198,6 +252,32 @@
       btn.setAttribute('aria-busy', 'true');
       btn.textContent = btn.dataset.loadingText;
     }, 0);
+  });
+
+  /* ------------------------------- Sub-category follows chosen category */
+  const sub = $('[data-subcategory]');
+  if (sub) {
+    const groups = $$('optgroup', sub).map((g) => ({ parent: g.dataset.parent, options: $$('option', g).map((o) => o.cloneNode(true)) }));
+    const wrap = $('[data-subcategory-wrap]');
+    const blank = sub.querySelector('option[value=""]').cloneNode(true);
+    const render = () => {
+      const chosen = $('input[name="category_id"]:checked');
+      const group = groups.find((g) => g.parent === chosen?.value);
+      const keep = sub.value;
+      sub.replaceChildren(blank.cloneNode(true), ...(group ? group.options.map((o) => o.cloneNode(true)) : []));
+      sub.value = group && group.options.some((o) => o.value === keep) ? keep : '';
+      // Progressive disclosure: only ask once a category with sub-types is chosen.
+      wrap.hidden = !group;
+    };
+    $$('input[name="category_id"]').forEach((r) => r.addEventListener('change', render));
+    render();
+  }
+
+  /* --------------------- Inline disclosures: focus the field they reveal */
+  $$('details[data-disclosure]').forEach((d) => {
+    d.addEventListener('toggle', () => {
+      if (d.open) $('textarea, input:not([type="hidden"]), select', d)?.focus();
+    });
   });
 
   /* -------------------------------------------- Focus server error summary */

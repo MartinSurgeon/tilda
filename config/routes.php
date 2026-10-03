@@ -2,10 +2,14 @@
 declare(strict_types=1);
 
 use App\Controllers\AccountController;
+use App\Controllers\Admin\SettingsController;
+use App\Controllers\AttachmentController;
 use App\Controllers\Admin\UserController;
 use App\Controllers\AuthController;
 use App\Controllers\DashboardController;
 use App\Controllers\PlaceholderController;
+use App\Controllers\TicketActionController;
+use App\Controllers\TicketController;
 
 /** @var App\Core\Router $router */
 
@@ -31,11 +35,34 @@ $router->post('/admin/users/{id}', [UserController::class, 'update'], ['can' => 
 $router->post('/admin/users/{id}/reset-password', [UserController::class, 'resetPassword'], ['can' => 'admin.users']);
 $router->post('/admin/users/{id}/unlock', [UserController::class, 'unlock'], ['can' => 'admin.users']);
 
-// Placeholders (replaced in later phases) — permissions are already final.
-$router->get('/tickets/create', [PlaceholderController::class, 'show'], ['can' => 'ticket.create']);
-$router->get('/tickets', [PlaceholderController::class, 'show'], ['can' => 'ticket.view_all']);
-$router->get('/tickets/mine', [PlaceholderController::class, 'show'], ['can' => 'ticket.view_own']);
+// Tickets
+$router->get('/tickets/create', [TicketController::class, 'create'], ['can' => 'ticket.create']);
+$router->post('/tickets', [TicketController::class, 'store'], ['can' => 'ticket.create']);
+$router->get('/tickets', [TicketController::class, 'index'], ['can' => 'ticket.view_all']);
+$router->get('/tickets/mine', [TicketController::class, 'mine'], ['can' => 'ticket.view_own']);
+// Object-level checks (own ticket vs. queue access) happen in TicketPolicy.
+$router->get('/tickets/{id}', [TicketController::class, 'show'], ['can' => ['ticket.view_all', 'ticket.view_own']]);
+$router->get('/tickets/{id}/submitted', [TicketController::class, 'submitted'], ['can' => 'ticket.view_own']);
+$router->post('/tickets/{id}/accept', [TicketActionController::class, 'accept'], ['can' => 'ticket.work']);
+$router->post('/tickets/{id}/assign', [TicketActionController::class, 'assign'], ['can' => ['ticket.assign', 'ticket.reassign']]);
+$router->post('/tickets/{id}/release', [TicketActionController::class, 'release'], ['can' => 'ticket.work']);
+$router->post('/tickets/{id}/status', [TicketActionController::class, 'status'], ['can' => ['ticket.work', 'ticket.view_own']]);
+$router->post('/tickets/{id}/priority', [TicketActionController::class, 'priority'], ['can' => 'ticket.work']);
+$router->post('/tickets/{id}/comments', [TicketActionController::class, 'comment'], ['can' => ['ticket.work', 'ticket.view_own']]);
+$router->get('/attachments/{id}', [AttachmentController::class, 'show'], ['can' => ['ticket.view_all', 'ticket.view_own']]);
+
+// Administration: settings
+$router->get('/admin/settings', [SettingsController::class, 'index'], ['can' => 'admin.settings']);
+$router->get('/admin/settings/categories', [SettingsController::class, 'categories'], ['can' => 'admin.settings']);
+$router->post('/admin/settings/categories', [SettingsController::class, 'storeCategory'], ['can' => 'admin.settings']);
+$router->post('/admin/settings/categories/{id}', [SettingsController::class, 'updateCategory'], ['can' => 'admin.settings']);
+$router->get('/admin/settings/departments', [SettingsController::class, 'departments'], ['can' => 'admin.settings']);
+$router->post('/admin/settings/departments', [SettingsController::class, 'storeDepartment'], ['can' => 'admin.settings']);
+$router->post('/admin/settings/departments/{id}', [SettingsController::class, 'updateDepartment'], ['can' => 'admin.settings']);
+$router->get('/admin/settings/priorities', [SettingsController::class, 'priorities'], ['can' => 'admin.settings']);
+$router->post('/admin/settings/priorities', [SettingsController::class, 'updatePriorities'], ['can' => 'admin.settings']);
+
+// Placeholders (replaced in later phases); permissions are already final.
 $router->get('/notifications', [PlaceholderController::class, 'show']);
 $router->get('/audit', [PlaceholderController::class, 'show'], ['can' => 'audit.view']);
 $router->get('/reports', [PlaceholderController::class, 'show'], ['can' => 'report.view']);
-$router->get('/admin/settings', [PlaceholderController::class, 'show'], ['can' => 'admin.settings']);
