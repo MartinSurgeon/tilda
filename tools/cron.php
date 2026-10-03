@@ -29,6 +29,7 @@ $jobs = [
     'sla_warnings' => [Scheduler::class, 'slaWarnings'],
     'sla_breaches' => [Scheduler::class, 'slaBreaches'],
     'auto_close'   => [Scheduler::class, 'autoClose'],
+    'audit_anchor' => [Scheduler::class, 'auditAnchor'],
     'send_mail'    => [Scheduler::class, 'sendMail'],
     'housekeeping' => [Scheduler::class, 'housekeeping'],
 ];

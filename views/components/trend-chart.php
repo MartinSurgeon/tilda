@@ -30,7 +30,7 @@ $sumR = array_sum($resolved);
 
 <details class="mt-3">
     <summary class="inline-flex min-h-touch cursor-pointer items-center text-sm font-semibold text-midnight">Show as table</summary>
-    <div class="mt-2 overflow-x-auto">
+    <div class="mt-2 overflow-x-auto" tabindex="0" role="region" aria-label="Daily figures">
         <table class="table">
             <thead><tr><th scope="col">Day</th><th scope="col" class="text-right">Opened</th><th scope="col" class="text-right">Resolved</th></tr></thead>
             <tbody>

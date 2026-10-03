@@ -23,6 +23,7 @@ php tools/composer.phar install
 mysql -u root -e "CREATE DATABASE ruma_itsm CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
 mysql -u root ruma_itsm < database/schema.sql
 mysql -u root ruma_itsm < database/triggers.sql
+mysql -u root ruma_itsm < database/change_triggers.sql
 mysql -u root ruma_itsm < database/seed.sql
 
 # 3. Configuration
@@ -131,7 +132,7 @@ A full guide comes in Phase 6. The essentials:
 2. Point the domain or subdomain document root at `/home/USER/ruma/public`.
    If you cannot change it, copy `public/` into `public_html` and change the
    `require` path in `public_html/index.php` to point at `/home/USER/ruma/app/bootstrap.php`.
-3. Create the database and user in *MySQL Databases*, then import the three SQL
+3. Create the database and user in *MySQL Databases*, then import the four SQL
    files in phpMyAdmin (see `database/MIGRATIONS.md`).
 4. Create `.env` from `.env.example` with `APP_ENV=production`, `APP_DEBUG=false`,
    `SESSION_SECURE=true`, and make sure HTTPS is enabled (AutoSSL).

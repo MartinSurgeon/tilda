@@ -45,6 +45,30 @@ final class Mailer
     }
 
     /**
+     * Generic branded message: a heading, paragraphs and one link.
+     * @return array{0: string, 1: string} [html, text]
+     */
+    public static function renderMessage(string $name, string $title, array $paragraphs, string $link, string $linkLabel): array
+    {
+        $first = explode(' ', $name)[0];
+        $paras = implode('', array_map(
+            static fn ($p) => '<p style="margin:0 0 12px;white-space:pre-line;word-break:break-all">' . e($p) . '</p>',
+            $paragraphs
+        ));
+        $html = '<!doctype html><html><body style="margin:0;background:#f5f5f5;font-family:Segoe UI,Arial,sans-serif;color:#545454">'
+            . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:24px 12px">'
+            . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:12px;border:1px solid #e2e2e2">'
+            . '<tr><td style="background:#0d8257;border-radius:12px 12px 0 0;padding:16px 24px;color:#ffffff;font-weight:bold">'
+            . e(setting('org.name', 'RUMA Hospital')) . ' · IT Support</td></tr>'
+            . '<tr><td style="padding:24px"><p style="margin:0 0 12px">Hello ' . e($first) . ',</p>'
+            . '<h1 style="margin:0 0 12px;font-size:18px;color:#2b2b2b">' . e($title) . '</h1>' . $paras
+            . '<a href="' . e($link) . '" style="display:inline-block;background:#0d8257;color:#ffffff;text-decoration:none;font-weight:bold;padding:12px 20px;border-radius:8px">'
+            . e($linkLabel) . '</a></td></tr></table></td></tr></table></body></html>';
+        $text = "Hello {$first},\n\n{$title}\n\n" . implode("\n\n", $paragraphs) . "\n\n{$linkLabel}: {$link}";
+        return [$html, $text];
+    }
+
+    /**
      * Branded, minimal notification email. Inline styles are fine here (email
      * clients ignore stylesheets); every dynamic value is escaped.
      * @return array{0: string, 1: string} [html, text]

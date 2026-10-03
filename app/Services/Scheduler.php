@@ -99,6 +99,46 @@ final class Scheduler
         return ['sent' => $sent, 'failed' => $failed];
     }
 
+    /**
+     * Once a day: record the current end-of-chain fingerprints and email them to
+     * everyone who can verify the audit log. Those emails live outside the
+     * database, so even someone able to rewrite the whole chain cannot make the
+     * earlier fingerprints match again.
+     */
+    public static function auditAnchor(): int
+    {
+        if (DB::value("SELECT 1 FROM audit_logs WHERE action = 'audit.anchor' AND created_at >= CURDATE() LIMIT 1")) {
+            return 0;
+        }
+        $heads = [];
+        foreach (['audit_logs', 'db_change_logs'] as $chain) {
+            $heads[$chain] = [
+                'rows' => (int) DB::value("SELECT COUNT(*) FROM {$chain}"),
+                'hash' => (string) DB::value('SELECT last_hash FROM audit_chain_head WHERE chain = ?', [$chain]),
+            ];
+        }
+        AuditLogger::log('audit.anchor', 'audit', null, 'Daily audit fingerprint recorded and sent to auditors', $heads);
+        file_put_contents(BASE_PATH . '/storage/logs/anchors.log', date('c') . ' ' . json_encode($heads) . "\n", FILE_APPEND | LOCK_EX);
+
+        $recipients = DB::all(
+            "SELECT DISTINCT u.full_name, u.email FROM users u
+             JOIN role_permissions rp ON rp.role_id = u.role_id JOIN permissions p ON p.id = rp.permission_id
+             WHERE p.slug = 'audit.verify' AND u.is_active = 1"
+        );
+        $lines = [
+            'Keep this email. It lets you prove later that the audit log was not rewritten.',
+            "Activity log: {$heads['audit_logs']['rows']} entries\n{$heads['audit_logs']['hash']}",
+            "Data change log: {$heads['db_change_logs']['rows']} entries\n{$heads['db_change_logs']['hash']}",
+        ];
+        foreach ($recipients as $r) {
+            [$html, $text] = Mailer::renderMessage($r['full_name'], 'Daily audit fingerprint ' . date('j M Y'), $lines,
+                absolute_url('/audit/integrity'), 'Open integrity check');
+            DB::run('INSERT INTO email_queue (to_email, to_name, subject, body_html, body_text) VALUES (?, ?, ?, ?, ?)',
+                [$r['email'], $r['full_name'], '[RUMA IT] Daily audit fingerprint ' . date('Y-m-d'), $html, $text]);
+        }
+        return count($recipients);
+    }
+
     /** Keep operational tables small. (Audit tables are never pruned.) */
     public static function housekeeping(): int
     {

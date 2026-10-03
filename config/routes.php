@@ -4,6 +4,7 @@ declare(strict_types=1);
 use App\Controllers\AccountController;
 use App\Controllers\Admin\SettingsController;
 use App\Controllers\AttachmentController;
+use App\Controllers\AuditController;
 use App\Controllers\Admin\UserController;
 use App\Controllers\AuthController;
 use App\Controllers\DashboardController;
@@ -59,6 +60,13 @@ $router->post('/tickets/{id}/priority', [TicketActionController::class, 'priorit
 $router->post('/tickets/{id}/comments', [TicketActionController::class, 'comment'], ['can' => ['ticket.work', 'ticket.view_own']]);
 $router->get('/attachments/{id}', [AttachmentController::class, 'show'], ['can' => ['ticket.view_all', 'ticket.view_own']]);
 
+// Audit (read-only: there are deliberately no edit or delete routes)
+$router->get('/audit', [AuditController::class, 'activity'], ['can' => 'audit.view']);
+$router->get('/audit/changes', [AuditController::class, 'changes'], ['can' => 'audit.view']);
+$router->get('/audit/export', [AuditController::class, 'export'], ['can' => 'audit.export']);
+$router->get('/audit/integrity', [AuditController::class, 'integrity'], ['can' => 'audit.verify']);
+$router->post('/audit/integrity', [AuditController::class, 'verify'], ['can' => 'audit.verify']);
+
 // Administration: settings
 $router->get('/admin/settings', [SettingsController::class, 'index'], ['can' => 'admin.settings']);
 $router->get('/admin/settings/categories', [SettingsController::class, 'categories'], ['can' => 'admin.settings']);
@@ -71,5 +79,4 @@ $router->get('/admin/settings/priorities', [SettingsController::class, 'prioriti
 $router->post('/admin/settings/priorities', [SettingsController::class, 'updatePriorities'], ['can' => 'admin.settings']);
 
 // Placeholders (replaced in later phases); permissions are already final.
-$router->get('/audit', [PlaceholderController::class, 'show'], ['can' => 'audit.view']);
 $router->get('/reports', [PlaceholderController::class, 'show'], ['can' => 'report.view']);
