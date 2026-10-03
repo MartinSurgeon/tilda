@@ -4,9 +4,9 @@ Internal ticketing for **RUMA Hospital (ruma.hospital)**. Staff report hardware
 and software problems, the IT team resolves them, management receives monthly
 reports, and every action is recorded in a tamper-evident audit trail.
 
-> **Status: Phase 3 (Dashboards & notifications) complete.** Role dashboards with
-> live updates, notification centre, email notifications, SLA alerts and
-> auto-close work. Next: Phase 4 (audit log viewer, DB change log, exports).
+> **Status: Phase 4 (Audit) complete.** Activity log, database change log with
+> old/new values, append-only protection, hash-chain integrity check, daily
+> fingerprint email, PDF/CSV export. See [AUDIT.md](AUDIT.md). Next: Phase 5 (monthly reports).
 
 - **Stack:** PHP 8.1+ (no framework), MySQL 8 / MariaDB 10.4+, Tailwind CSS (pre-built), vanilla JS
 - **Runs on:** cPanel shared hosting or any VPS. Node is only needed on a developer machine.
