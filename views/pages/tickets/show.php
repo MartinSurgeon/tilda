@@ -22,7 +22,7 @@ $shared = compact('t', 'transitions', 'canAccept', 'canAssign', 'canRelease', 'c
 ?>
 <a href="<?= e(url($back[0])) ?>" class="mb-3 inline-flex min-h-touch items-center gap-1 text-sm font-semibold"><?= icon('chevron-left', 'h-4 w-4') ?> <?= e($back[1]) ?></a>
 
-<header class="mb-6">
+<header id="live-ticket-header" data-live class="mb-6">
     <p class="font-mono text-sm text-muted"><?= e($t['ref']) ?></p>
     <h1 class="page-title mt-1 break-words"><?= e($t['title']) ?></h1>
     <div class="mt-3 flex flex-wrap items-center gap-2">
@@ -34,11 +34,11 @@ $shared = compact('t', 'transitions', 'canAccept', 'canAssign', 'canRelease', 'c
 
 <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
     <!-- Next step first: the one thing to do now. -->
-    <div class="min-w-0 space-y-6 lg:col-start-1">
+    <div id="live-actions" data-live class="min-w-0 space-y-6 empty:hidden lg:col-start-1">
         <?= View::partial('pages/tickets/_actions', $shared) ?>
     </div>
 
-    <aside class="space-y-6 lg:col-start-2 lg:row-span-2 lg:row-start-1" aria-label="Ticket details">
+    <aside id="live-details" data-live class="space-y-6 lg:col-start-2 lg:row-span-2 lg:row-start-1" aria-label="Ticket details">
         <?= View::partial('pages/tickets/_details', $shared) ?>
     </aside>
 
@@ -56,7 +56,7 @@ $shared = compact('t', 'transitions', 'canAccept', 'canAssign', 'canRelease', 'c
             </div>
         </section>
 
-        <?= View::partial('pages/tickets/_timeline', compact('t', 'comments', 'history', 'commentFiles')) ?>
+        <div id="live-activity" data-live><?= View::partial('pages/tickets/_timeline', compact('t', 'comments', 'history', 'commentFiles')) ?></div>
 
         <?php if ($canComment): ?>
             <?= View::partial('pages/tickets/_reply', compact('t', 'canInternal', 'isRequester')) ?>

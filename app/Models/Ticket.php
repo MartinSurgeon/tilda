@@ -118,8 +118,8 @@ final class Ticket
     public static function history(int $ticketId): array
     {
         return DB::all(
-            'SELECT h.*, u.full_name FROM ticket_status_history h JOIN users u ON u.id = h.changed_by
-             WHERE h.ticket_id = ? ORDER BY h.created_at, h.id',
+            "SELECT h.*, COALESCE(u.full_name, 'System') AS full_name FROM ticket_status_history h LEFT JOIN users u ON u.id = h.changed_by
+             WHERE h.ticket_id = ? ORDER BY h.created_at, h.id",
             [$ticketId]
         );
     }

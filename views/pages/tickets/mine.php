@@ -12,6 +12,7 @@ $awaiting = (int) ($counts['awaiting'] ?? 0);
     <?php endif; ?>
 </header>
 
+<div id="live-mine" data-live>
 <?php if ($awaiting > 0): ?>
     <div class="alert-info mb-5" role="status">
         <?= icon('check-circle', 'mt-0.5 h-5 w-5 shrink-0') ?>
@@ -49,3 +50,4 @@ $awaiting = (int) ($counts['awaiting'] ?? 0);
     <?= App\Core\View::partial('components/pagination', ['page' => $page, 'pages' => $pages, 'path' => '/tickets/mine',
         'query' => ['view' => $view === 'active' ? null : $view]]) ?>
 <?php endif; ?>
+</div>

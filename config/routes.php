@@ -7,6 +7,7 @@ use App\Controllers\AttachmentController;
 use App\Controllers\Admin\UserController;
 use App\Controllers\AuthController;
 use App\Controllers\DashboardController;
+use App\Controllers\NotificationController;
 use App\Controllers\PlaceholderController;
 use App\Controllers\TicketActionController;
 use App\Controllers\TicketController;
@@ -25,6 +26,13 @@ $router->get('/', [DashboardController::class, 'index']);
 $router->get('/account', [AccountController::class, 'show'], ['allow_password_change' => true]);
 $router->get('/account/password', [AccountController::class, 'showPassword'], ['allow_password_change' => true]);
 $router->post('/account/password', [AccountController::class, 'updatePassword'], ['allow_password_change' => true]);
+
+// Notifications & live updates
+$router->get('/notifications', [NotificationController::class, 'index']);
+$router->get('/notifications/{id}', [NotificationController::class, 'open']);
+$router->post('/notifications/read-all', [NotificationController::class, 'readAll']);
+$router->post('/account/notifications', [NotificationController::class, 'preferences']);
+$router->get('/api/poll', [NotificationController::class, 'poll']);
 
 // Administration: users
 $router->get('/admin/users', [UserController::class, 'index'], ['can' => 'admin.users']);
@@ -63,6 +71,5 @@ $router->get('/admin/settings/priorities', [SettingsController::class, 'prioriti
 $router->post('/admin/settings/priorities', [SettingsController::class, 'updatePriorities'], ['can' => 'admin.settings']);
 
 // Placeholders (replaced in later phases); permissions are already final.
-$router->get('/notifications', [PlaceholderController::class, 'show']);
 $router->get('/audit', [PlaceholderController::class, 'show'], ['can' => 'audit.view']);
 $router->get('/reports', [PlaceholderController::class, 'show'], ['can' => 'report.view']);

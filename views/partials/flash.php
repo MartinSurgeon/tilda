@@ -1,5 +1,6 @@
 <?php
-$flashes = App\Core\Session::takeFlashes();
+// Background refreshes must not consume messages meant for the visible page.
+$flashes = App\Core\Request::isBackground() ? [] : App\Core\Session::takeFlashes();
 $icons = ['success' => 'check-circle', 'info' => 'info', 'warning' => 'alert-triangle', 'danger' => 'alert-circle'];
 ?>
 <?php if ($flashes): ?>

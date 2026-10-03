@@ -245,7 +245,7 @@ CREATE TABLE ticket_status_history (
     ticket_id   INT UNSIGNED NOT NULL,
     from_status VARCHAR(20)  NULL,
     to_status   VARCHAR(20)  NOT NULL,
-    changed_by  INT UNSIGNED NOT NULL,
+    changed_by  INT UNSIGNED NULL,               -- NULL = automatic (cron), shown as "System"
     note        VARCHAR(500) NOT NULL DEFAULT '',
     created_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),

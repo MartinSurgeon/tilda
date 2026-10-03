@@ -60,11 +60,13 @@
     --rgb-line-strong: 138 138 138; /* #8a8a8a  form borders, 3.45:1 (UI ≥ 3:1) */
   }
 
-  html { -webkit-text-size-adjust: 100%; }
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
   body { @apply bg-smoke text-charcoal antialiased; }
   h1, h2, h3, h4 { @apply text-ink; }
   a { @apply text-midnight underline-offset-2; }
   a:hover { @apply underline; }
+  /* Links inside running text are underlined, so they never rely on colour alone. */
+  p a:not([class*="btn"]) { @apply underline; }
 
   /* One visible, consistent focus style for keyboard users. */
   :focus-visible { @apply outline outline-2 outline-offset-2 outline-midnight; }
@@ -157,9 +159,42 @@
   /* Data tables become stacked cards below md (see views using .responsive-table). */
   .table { @apply w-full text-left text-sm; }
   .table th { @apply border-b border-line px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted; }
-  .table td { @apply border-b border-line px-4 py-3 align-middle; }
+  .table td, .table tbody th { @apply border-b border-line px-4 py-3 align-middle; }
+  .table tbody th { @apply text-sm normal-case tracking-normal; }
   .table tbody tr:last-child td { @apply border-b-0; }
   .table tbody tr:hover { @apply bg-smoke-2; }
+}
+
+/* ---- Charts (series colours validated: cornflower + teal pass CVD & contrast checks) ---- */
+@layer components {
+  .legend-line     { display: inline-block; width: 1rem; height: 2px; border-radius: 9999px; }
+  .legend-opened   { background: rgb(var(--rgb-cornflower)); }
+  .legend-resolved { background: rgb(var(--rgb-teal)); }
+
+  .trend-chart svg { display: block; width: 100%; overflow: visible; }
+  .trend-chart:focus-visible { outline: 2px solid rgb(var(--rgb-midnight)); outline-offset: 4px; border-radius: 4px; }
+  .chart-grid      { stroke: rgb(var(--rgb-line)); stroke-width: 1; shape-rendering: crispEdges; }
+  .chart-axis      { fill: rgb(var(--rgb-muted)); font-size: 12px; }
+  .chart-value     { fill: rgb(var(--rgb-ink)); font-size: 12px; font-weight: 600; }
+  .chart-line      { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+  .chart-dot       { stroke: #fff; stroke-width: 2; }
+  .series-opened   { stroke: rgb(var(--rgb-cornflower)); }
+  .series-resolved { stroke: rgb(var(--rgb-teal)); }
+  .chart-dot.series-opened   { fill: rgb(var(--rgb-cornflower)); stroke: #fff; }
+  .chart-dot.series-resolved { fill: rgb(var(--rgb-teal)); stroke: #fff; }
+  .chart-crosshair { stroke: rgb(var(--rgb-line-strong)); stroke-width: 1; shape-rendering: crispEdges; }
+  .chart-tooltip   { @apply pointer-events-none absolute z-10 min-w-[8rem] rounded-lg border border-line bg-white px-3 py-2 text-sm shadow-raised; }
+
+  /* Horizontal meters (single value per row; label + number always shown beside). */
+  .meter { -webkit-appearance: none; appearance: none; display: block; width: 100%; height: 0.5rem; border: 0;
+           border-radius: 9999px; background: rgb(var(--rgb-neutral-tint)); }
+  .meter::-webkit-meter-bar { background: rgb(var(--rgb-neutral-tint)); border: 0; border-radius: 9999px; height: 0.5rem; }
+  .meter::-webkit-meter-optimum-value { background: var(--meter-color); border-radius: 9999px; }
+  .meter::-moz-meter-bar { background: var(--meter-color); border-radius: 9999px; }
+  .meter-critical { --meter-color: rgb(var(--rgb-danger)); }
+  .meter-high     { --meter-color: rgb(var(--rgb-warning)); }
+  .meter-medium   { --meter-color: rgb(var(--rgb-midnight)); }
+  .meter-low      { --meter-color: rgb(var(--rgb-line-strong)); }
 }
 
 @layer utilities {

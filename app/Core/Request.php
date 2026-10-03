@@ -85,6 +85,9 @@ final class Request
 
     public static function ip(): string
     {
+        if (PHP_SAPI === 'cli') {
+            return 'cli';
+        }
         $remote = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
         if (self::fromTrustedProxy()) {
             $forwarded = explode(',', (string) self::header('X-Forwarded-For'));

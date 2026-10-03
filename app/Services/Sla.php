@@ -50,11 +50,12 @@ final class Sla
                 ? self::out('met', 'Within target', 'badge-success', 'check-circle')
                 : self::out('breached', 'Missed target', 'badge-danger', 'alert-triangle');
         }
-        if (time() > $due) {
-            return self::out('breached', 'Overdue by ' . self::duration(time() - $due), 'badge-danger', 'alert-triangle');
-        }
+        // The deadline moves back when the hold ends, so "overdue" would be premature.
         if ($t['status'] === 'on_hold') {
             return self::out('paused', 'Clock paused', 'badge-neutral', 'pause-circle');
+        }
+        if (time() > $due) {
+            return self::out('breached', 'Overdue by ' . self::duration(time() - $due), 'badge-danger', 'alert-triangle');
         }
 
         $start = strtotime($t['created_at']);

@@ -15,6 +15,29 @@
         </dl>
     </section>
 
+    <section class="card" aria-labelledby="notify-title">
+        <div class="card-header"><h2 id="notify-title" class="card-title">Email notifications</h2></div>
+        <form method="post" action="<?= e(url('/account/notifications')) ?>" class="card-body space-y-4">
+            <?= csrf_field() ?>
+            <p class="text-sm">You always see updates under <a href="<?= e(url('/notifications')) ?>">Notifications</a>. Choose what you also want by email to <strong class="text-ink"><?= e($me['email']) ?></strong>.</p>
+            <?php if (!$emailEnabled): ?>
+                <div class="alert-warning"><?= icon('info', 'mt-0.5 h-5 w-5 shrink-0') ?><p>Email is currently switched off for the whole system. Your choices are saved for when it is turned on.</p></div>
+            <?php endif; ?>
+            <fieldset>
+                <legend class="sr-only">Email me when</legend>
+                <div class="space-y-1">
+                    <?php foreach ($prefs as $event => $p): ?>
+                        <label class="flex min-h-touch cursor-pointer items-center gap-3 rounded-lg px-2 hover:bg-smoke-2">
+                            <input type="checkbox" name="email[<?= e($event) ?>]" value="1" class="checkbox" <?= $p['email'] ? 'checked' : '' ?>>
+                            <span class="text-sm text-ink"><?= e($p['label']) ?></span>
+                        </label>
+                    <?php endforeach; ?>
+                </div>
+            </fieldset>
+            <button type="submit" class="btn-secondary">Save email settings</button>
+        </form>
+    </section>
+
     <section class="card" aria-labelledby="security-title">
         <div class="card-header"><h2 id="security-title" class="card-title">Security</h2></div>
         <div class="card-body flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

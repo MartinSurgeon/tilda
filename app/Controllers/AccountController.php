@@ -10,13 +10,24 @@ use App\Core\Response;
 use App\Core\Session;
 use App\Core\View;
 use App\Services\AuditLogger;
+use App\Services\Notifier;
 use App\Services\PasswordPolicy;
 
 final class AccountController
 {
     public function show(): void
     {
-        View::show('account/show', ['title' => 'My account']);
+        $user = Auth::user();
+        $saved = array_column(DB::all('SELECT event, email FROM notification_preferences WHERE user_id = ?', [$user['id']]), 'email', 'event');
+        $prefs = [];
+        foreach (Notifier::eventsFor(\App\Core\Gate::allows('ticket.work')) as $event => [$label, $default]) {
+            $prefs[$event] = ['label' => $label, 'email' => isset($saved[$event]) ? (int) $saved[$event] === 1 : $default];
+        }
+        View::show('account/show', [
+            'title'        => 'My account',
+            'prefs'        => $prefs,
+            'emailEnabled' => setting('notifications.email', '1') === '1',
+        ]);
     }
 
     public function showPassword(): void

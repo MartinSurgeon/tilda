@@ -11,6 +11,8 @@ $groups = nav_groups();
     <meta name="csrf-token" content="<?= e(csrf_token()) ?>">
     <meta name="base-path" content="<?= e(url('/')) ?>">
     <meta name="theme-color" content="#0d8257">
+    <meta name="live-version" content="<?= e(App\Services\LiveVersion::for($me)) ?>">
+    <meta name="poll-interval" content="<?= (int) setting('poll.interval_seconds', '15') ?>">
     <title><?= e(($title ?? 'Dashboard') . ' · ' . config('name')) ?></title>
     <link rel="icon" href="<?= e(url('favicon.svg')) ?>" type="image/svg+xml">
     <link rel="stylesheet" href="<?= e(asset('css/app.css')) ?>">

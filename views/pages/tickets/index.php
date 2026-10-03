@@ -15,7 +15,7 @@ $keep = ['view' => $view] + array_filter($filters, static fn ($v) => $v !== '' &
 </header>
 
 <!-- Views (tabs). Scrolls sideways on small screens instead of wrapping. -->
-<nav class="-mx-4 mb-4 overflow-x-auto px-4 sm:mx-0 sm:px-0" aria-label="Queue views">
+<nav id="live-tabs" data-live class="-mx-4 mb-4 overflow-x-auto px-4 sm:mx-0 sm:px-0" aria-label="Queue views">
     <ul class="flex min-w-max gap-2" role="list">
         <?php foreach ($views as $key => $label):
             $n = $key === 'done' ? null : (int) ($counts[$key] ?? 0);
@@ -100,6 +100,7 @@ $keep = ['view' => $view] + array_filter($filters, static fn ($v) => $v !== '' &
     </details>
 </form>
 
+<div id="live-results" data-live>
 <?php if (!$tickets): ?>
     <div class="card">
         <?= App\Core\View::partial('components/empty-state', match (true) {
@@ -147,3 +148,4 @@ $keep = ['view' => $view] + array_filter($filters, static fn ($v) => $v !== '' &
 
     <?= App\Core\View::partial('components/pagination', ['page' => $page, 'pages' => $pages, 'path' => '/tickets', 'query' => $keep]) ?>
 <?php endif; ?>
+</div>

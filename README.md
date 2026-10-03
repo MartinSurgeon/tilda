@@ -4,9 +4,9 @@ Internal ticketing for **RUMA Hospital (ruma.hospital)**. Staff report hardware
 and software problems, the IT team resolves them, management receives monthly
 reports, and every action is recorded in a tamper-evident audit trail.
 
-> **Status: Phase 2 (Tickets) complete.** Sign-in, roles, user management,
-> ticket submission, queue, workflow, SLAs, attachments and settings work.
-> Next: Phase 3 (live dashboards, notification centre, email).
+> **Status: Phase 3 (Dashboards & notifications) complete.** Role dashboards with
+> live updates, notification centre, email notifications, SLA alerts and
+> auto-close work. Next: Phase 4 (audit log viewer, DB change log, exports).
 
 - **Stack:** PHP 8.1+ (no framework), MySQL 8 / MariaDB 10.4+, Tailwind CSS (pre-built), vanilla JS
 - **Runs on:** cPanel shared hosting or any VPS. Node is only needed on a developer machine.
@@ -83,6 +83,30 @@ Open → Assigned → In progress ⇄ On hold → Resolved → Closed
   Images are re-encoded (removes location data from phone photos). Files live in `storage/uploads`
   and are only served after a permission check. Make sure PHP `upload_max_filesize` and
   `post_max_size` are at least `UPLOAD_MAX_MB` × 3.
+
+## Live updates
+
+Pages poll `/api/poll` every 15 seconds (*settings* `poll.interval_seconds`) and refresh only
+the parts that changed, so dashboards, queues and open tickets update without a reload.
+Polling was chosen over Server-Sent Events because SSE keeps one PHP process busy per open
+tab, which shared hosting quickly runs out of. Polling pauses in background tabs and does
+not count as activity for the idle sign-out. A region the user is typing in is never replaced.
+
+## Background jobs (cron)
+
+Run `tools/cron.php` every 5 minutes. In cPanel → *Cron Jobs*:
+
+```
+*/5 * * * * /usr/local/bin/php /home/CPANELUSER/ruma/tools/cron.php >> /home/CPANELUSER/ruma/storage/logs/cron.log 2>&1
+```
+
+It sends queued emails (3 attempts), warns when a ticket passes its SLA warning point,
+escalates missed SLAs to IT Managers, closes resolved tickets after `tickets.auto_close_days`
+(default 5) without a reply, and prunes old sign-in attempts. Safe to run by hand: `php tools/cron.php`.
+
+**Email:** set `MAIL_ENABLED=true` and the `MAIL_*` SMTP values in `.env` (cPanel → *Email Accounts*
+→ *Connect Devices* shows them). With `MAIL_ENABLED=false`, emails go to `storage/logs/mail.log`.
+Staff choose which events they get by email under *My account*.
 
 ## Project layout
 

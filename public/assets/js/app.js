@@ -203,11 +203,13 @@
     if (big) return `“${big.name}” is too large. The limit is ${Math.round(bytes / 1048576)} MB per file.`;
     return null;
   };
-  $$('input[type="file"][data-max-files]').forEach((input) => {
+  /* Per-element behaviour lives in enhance(root) so refreshed live regions get it too. */
+  const enhance = (root) => {
+  $$('input[type="file"][data-max-files]', root).forEach((input) => {
     input.addEventListener('change', () => setError(input, fileError(input)));
   });
 
-  $$('form[data-validate]').forEach((form) => {
+  $$('form[data-validate]', root).forEach((form) => {
     const radioNames = [...new Set($$('input[type="radio"][required]', form).map((r) => r.name))];
     radioNames.forEach((name) => $$(`input[name="${name}"]`, form).forEach((r) => {
       r.addEventListener('change', () => radioGroupError(form, name));
@@ -223,7 +225,7 @@
     });
   });
 
-  $$('form[data-validate]').forEach((form) => {
+  $$('form[data-validate]', root).forEach((form) => {
     const fields = $$('input[id], select[id], textarea[id]', form).filter((f) => f.type !== 'hidden' && f.type !== 'file');
     fields.forEach((f) => {
       // Validate on blur (not while typing) — kinder than shouting mid-word.
@@ -240,6 +242,15 @@
       }
     });
   });
+
+  /* Inline disclosures: focus the field they reveal. */
+  $$('details[data-disclosure]', root).forEach((d) => {
+    d.addEventListener('toggle', () => {
+      if (d.open) $('textarea, input:not([type="hidden"]), select', d)?.focus();
+    });
+  });
+  };
+  enhance(document);
 
   /* ------------------------------------------- Submit loading state */
   document.addEventListener('submit', (e) => {
@@ -273,12 +284,228 @@
     render();
   }
 
-  /* --------------------- Inline disclosures: focus the field they reveal */
-  $$('details[data-disclosure]').forEach((d) => {
-    d.addEventListener('toggle', () => {
-      if (d.open) $('textarea, input:not([type="hidden"]), select', d)?.focus();
+  /* ================================================== Trend chart (SVG) */
+  const SVG_NS = 'http://www.w3.org/2000/svg';
+  const svgEl = (name, attrs = {}, parent) => {
+    const node = document.createElementNS(SVG_NS, name);
+    Object.entries(attrs).forEach(([k, v]) => node.setAttribute(k, String(v)));
+    if (parent) parent.appendChild(node);
+    return node;
+  };
+  const niceStep = (max) => {
+    if (max <= 5) return 1;
+    if (max <= 10) return 2;
+    if (max <= 25) return 5;
+    const mag = 10 ** Math.floor(Math.log10(max / 4));
+    return [1, 2, 5, 10].map((f) => f * mag).find((s) => max / s <= 5) || mag * 10;
+  };
+
+  const drawChart = (box) => {
+    let data;
+    try { data = JSON.parse(box.dataset.chart); } catch { return; }
+    const W = box.clientWidth;
+    if (!W) return;
+    const H = W < 480 ? 200 : 240;
+    const m = { t: 12, r: 40, b: 28, l: 32 };
+    const iw = W - m.l - m.r;
+    const ih = H - m.t - m.b;
+    const n = data.labels.length;
+    const max = Math.max(1, ...data.series.flatMap((s) => s.values));
+    const step = niceStep(max);
+    const top = Math.ceil(max / step) * step;
+    const x = (i) => m.l + (n === 1 ? iw / 2 : (i * iw) / (n - 1));
+    const y = (v) => m.t + ih - (v / top) * ih;
+
+    $('svg', box)?.remove();
+    const svg = svgEl('svg', { width: W, height: H, viewBox: `0 0 ${W} ${H}`, 'aria-hidden': 'true', focusable: 'false' });
+
+    // Recessive hairline grid + clean integer ticks.
+    for (let v = 0; v <= top; v += step) {
+      svgEl('line', { class: 'chart-grid', x1: m.l, x2: W - m.r, y1: y(v), y2: y(v) }, svg);
+      svgEl('text', { class: 'chart-axis', x: m.l - 8, y: y(v) + 4, 'text-anchor': 'end' }, svg).textContent = v.toLocaleString();
+    }
+    // X labels thinned so they never collide; the last day is always labelled.
+    const every = Math.max(1, Math.ceil(64 / (iw / Math.max(1, n - 1))));
+    data.labels.forEach((label, i) => {
+      const isLast = i === n - 1;
+      if (!(i % every === 0 || isLast) || (!isLast && n - 1 - i < every)) return;
+      svgEl('text', { class: 'chart-axis', x: x(i), y: H - 8, 'text-anchor': isLast ? 'end' : (i === 0 ? 'start' : 'middle') }, svg).textContent = label;
     });
+
+    // 2px lines, ringed end dots, value labels at the end (nudged apart if close).
+    const ends = [];
+    data.series.forEach((s) => {
+      const d = s.values.map((v, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+      svgEl('path', { class: `chart-line series-${s.key}`, d }, svg);
+      const last = s.values[n - 1];
+      svgEl('circle', { class: `chart-dot series-${s.key}`, cx: x(n - 1), cy: y(last), r: 4 }, svg);
+      ends.push({ y: y(last), v: last });
+    });
+    if (ends.length === 2 && Math.abs(ends[0].y - ends[1].y) < 14) {
+      const [a, b] = ends[0].y <= ends[1].y ? [ends[0], ends[1]] : [ends[1], ends[0]];
+      const mid = (a.y + b.y) / 2;
+      a.y = mid - 7; b.y = mid + 7;
+    }
+    ends.forEach((e) => {
+      svgEl('text', { class: 'chart-value', x: W - m.r + 10, y: e.y + 4 }, svg).textContent = e.v.toLocaleString();
+    });
+
+    // Hover layer: crosshair snaps to the nearest day; one tooltip lists every series.
+    const cross = svgEl('g', { visibility: 'hidden' }, svg);
+    svgEl('line', { class: 'chart-crosshair', y1: m.t, y2: m.t + ih, x1: 0, x2: 0 }, cross);
+    const hoverDots = data.series.map((s) => svgEl('circle', { class: `chart-dot series-${s.key}`, r: 4, cx: 0, cy: 0 }, cross));
+    const hit = svgEl('rect', { x: m.l - 8, y: 0, width: iw + 16, height: H, fill: 'transparent' }, svg);
+    box.prepend(svg);
+
+    let tip = $('.chart-tooltip', box);
+    if (!tip) {
+      tip = document.createElement('div');
+      tip.className = 'chart-tooltip';
+      tip.hidden = true;
+      box.appendChild(tip);
+    }
+    const show = (i) => {
+      box.dataset.index = String(i);
+      cross.setAttribute('visibility', 'visible');
+      $('line', cross).setAttribute('x1', x(i));
+      $('line', cross).setAttribute('x2', x(i));
+      hoverDots.forEach((dot, si) => { dot.setAttribute('cx', x(i)); dot.setAttribute('cy', y(data.series[si].values[i])); });
+      // Built with textContent: labels are data, never markup.
+      tip.replaceChildren();
+      const head = document.createElement('p');
+      head.className = 'mb-1 text-xs text-muted';
+      head.textContent = data.labels[i];
+      tip.appendChild(head);
+      data.series.forEach((s) => {
+        const row = document.createElement('p');
+        row.className = 'flex items-center gap-2';
+        const key = document.createElement('span');
+        key.className = `legend-line legend-${s.key}`;
+        const val = document.createElement('strong');
+        val.className = 'text-ink';
+        val.textContent = s.values[i].toLocaleString();
+        const name = document.createElement('span');
+        name.className = 'text-muted';
+        name.textContent = s.name;
+        row.append(key, val, name);
+        tip.appendChild(row);
+      });
+      tip.hidden = false;
+      const left = Math.min(Math.max(0, x(i) + 12), W - tip.offsetWidth);
+      tip.style.left = `${x(i) + 12 + tip.offsetWidth > W ? Math.max(0, x(i) - 12 - tip.offsetWidth) : left}px`;
+      tip.style.top = '0px';
+    };
+    const hide = () => { cross.setAttribute('visibility', 'hidden'); tip.hidden = true; delete box.dataset.index; };
+    const nearest = (clientX) => {
+      const px = clientX - svg.getBoundingClientRect().left;
+      return Math.max(0, Math.min(n - 1, Math.round(((px - m.l) / iw) * (n - 1))));
+    };
+    hit.addEventListener('pointermove', (e) => show(nearest(e.clientX)));
+    hit.addEventListener('pointerleave', hide);
+    box.onkeydown = (e) => {
+      const cur = box.dataset.index === undefined ? n : parseInt(box.dataset.index, 10);
+      if (e.key === 'ArrowLeft') { e.preventDefault(); show(Math.max(0, Math.min(cur, n) - 1)); }
+      else if (e.key === 'ArrowRight') { e.preventDefault(); show(Math.min(n - 1, cur === n ? n - 1 : cur + 1)); }
+      else if (e.key === 'Escape') hide();
+    };
+    box.onblur = hide;
+  };
+
+  const chartObserver = 'ResizeObserver' in window
+    ? new ResizeObserver((entries) => entries.forEach((en) => drawChart(en.target)))
+    : null;
+  const initCharts = (root) => $$('[data-chart]', root).forEach((box) => {
+    drawChart(box);
+    chartObserver?.observe(box);
   });
+  initCharts(document);
+
+  /* ============================================= Live updates (polling) */
+  // Polling, not SSE: on shared hosting a held-open request ties up a PHP
+  // worker per open tab. A small request every few seconds scales fine.
+  const metaContent = (name) => $(`meta[name="${name}"]`)?.content;
+  let version = metaContent('live-version');
+  const intervalMs = Math.max(5, parseInt(metaContent('poll-interval') || '15', 10)) * 1000;
+
+  let announcer = $('[data-live-stamp]');
+  if (!announcer && version) {
+    announcer = document.createElement('p');
+    announcer.className = 'sr-only';
+    announcer.setAttribute('aria-live', 'polite');
+    document.body.appendChild(announcer);
+  }
+
+  const setBell = (count) => {
+    $$('[data-bell-count]').forEach((el) => {
+      el.textContent = count > 99 ? '99+' : String(count);
+      el.classList.toggle('hidden', count === 0);
+    });
+    $('[data-bell]')?.setAttribute('aria-label', count ? `Notifications, ${count} unread` : 'Notifications');
+  };
+
+  // Never pull the rug from under someone: skip a region while they are using it.
+  const isBusy = (region) => {
+    const active = document.activeElement;
+    if (active && active !== document.body && region.contains(active)) return true;
+    if ($$('details[open]', region).some((d) => $('form', d))) return true;
+    return $$('textarea, input[type="text"], input[type="search"], input:not([type])', region).some((f) => f.value !== f.defaultValue);
+  };
+
+  let refreshing = false;
+  const refreshLive = async () => {
+    const regions = $$('[data-live][id]');
+    if (!regions.length) return { done: true, changed: 0 };
+    if (refreshing) return { done: false, changed: 0 };
+    refreshing = true;
+    try {
+      const res = await fetch(window.location.href, { headers: { 'X-Background': '1' }, credentials: 'same-origin' });
+      if (!res.ok || res.redirected) return { done: false, changed: 0 };
+      const doc = new DOMParser().parseFromString(await res.text(), 'text/html');
+      let done = true;
+      let changed = 0;
+      regions.forEach((region) => {
+        const fresh = doc.getElementById(region.id);
+        if (!fresh) return;
+        if (isBusy(region)) { done = false; return; }
+        if (region.innerHTML !== fresh.innerHTML) {
+          region.innerHTML = fresh.innerHTML; // same-origin, server-escaped markup
+          enhance(region);
+          initCharts(region);
+          changed++;
+        }
+        region.hidden = fresh.hidden;
+      });
+      return { done, changed };
+    } finally {
+      refreshing = false;
+    }
+  };
+
+  let timer = null;
+  const poll = async () => {
+    if (document.hidden || !version) return;
+    try {
+      const res = await fetch(`${window.RUMA.base()}/api/poll`, {
+        headers: { 'X-Background': '1', Accept: 'application/json' },
+        credentials: 'same-origin',
+      });
+      if (res.status === 401 || res.status === 403) { clearInterval(timer); return; } // signed out: stop quietly
+      if (!res.ok) return;
+      const data = await res.json();
+      setBell(data.unread);
+      if (data.version !== version) {
+        const { done, changed } = await refreshLive();
+        if (done) version = data.version; // otherwise retry on the next tick
+        if (changed && announcer) {
+          announcer.textContent = `Updated at ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+        }
+      }
+    } catch { /* offline or server busy: try again next tick */ }
+  };
+  if (version) {
+    timer = setInterval(poll, intervalMs);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) poll(); });
+  }
 
   /* -------------------------------------------- Focus server error summary */
   const summary = $('[data-error-summary]');
