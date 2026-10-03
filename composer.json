@@ -1,0 +1,21 @@
+{
+    "name": "ruma/it-support",
+    "description": "RUMA Hospital IT Support & Maintenance Reporting System",
+    "type": "project",
+    "license": "proprietary",
+    "require": {
+        "php": ">=8.1",
+        "ext-pdo": "*",
+        "ext-mbstring": "*",
+        "ext-fileinfo": "*",
+        "dompdf/dompdf": "^3.0",
+        "phpmailer/phpmailer": "^6.9"
+    },
+    "autoload": {
+        "psr-4": { "App\\": "app/" }
+    },
+    "config": {
+        "platform": { "php": "8.1.0" },
+        "sort-packages": true
+    }
+}

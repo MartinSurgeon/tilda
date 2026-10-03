@@ -1,0 +1,15 @@
+Options -Indexes -MultiViews
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [QSA,L]
+</IfModule>
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+<IfModule mod_headers.c>
+    <FilesMatch "\.(css|js|svg|png|woff2)$">
+        Header set Cache-Control "public, max-age=604800"
+        Header set X-Content-Type-Options "nosniff"
+    </FilesMatch>
+</IfModule>

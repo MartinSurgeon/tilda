@@ -1,0 +1,16 @@
+# Safety net for hosts where the project root is web-served (e.g. the whole
+# project uploaded into public_html). Everything is routed into /public so
+# app/, config/, storage/, vendor/ and .env are never reachable.
+# Preferred setup: point the document root at /public (see README).
+Options -Indexes
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^public/ - [L]
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
+<IfModule !mod_rewrite.c>
+    Require all denied
+</IfModule>
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>

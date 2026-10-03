@@ -1,0 +1,45 @@
+# Database migrations
+
+## Files
+
+| File | Purpose | Safe to re-run? |
+|---|---|---|
+| `schema.sql` | Creates every table. **Drops existing tables first.** | No: deletes all data |
+| `triggers.sql` | Audit hash chain + append-only triggers | Yes |
+| `seed.sql` | Roles, permissions, reference data, demo users | Only on an empty database |
+| `grants.sql` | Least-privilege MySQL accounts (VPS only) | Yes |
+
+## Fresh install
+
+```bash
+mysql -u OWNER -p DBNAME < database/schema.sql
+mysql -u OWNER -p DBNAME < database/triggers.sql
+mysql -u OWNER -p DBNAME < database/seed.sql
+```
+
+On cPanel, use phpMyAdmin → *Import* for each file in the same order. phpMyAdmin
+understands the `DELIMITER` lines in `triggers.sql`.
+
+## Changing the schema after go-live
+
+`schema.sql` is for fresh installs only. For a live system:
+
+1. Write a new file `database/migrations/YYYY_MM_DD_short_name.sql` that only
+   contains `ALTER TABLE` / `CREATE TABLE` / `INSERT` statements.
+2. Back up first: `mysqldump --single-transaction --routines --triggers DBNAME > backup.sql`.
+3. Apply the migration, then fold the same change into `schema.sql` so fresh
+   installs match.
+4. Never `UPDATE`, `DELETE` or `TRUNCATE` `audit_logs`, `db_change_logs` or
+   `audit_chain_head`. The triggers block updates and deletes. `TRUNCATE`
+   bypasses triggers, but the integrity check detects it (see `AUDIT.md`).
+
+## Compatibility
+
+Tested on MariaDB 10.4 (XAMPP). Written for MySQL 8.0.16+ / MariaDB 10.4+:
+
+- JSON is stored as `LONGTEXT` with a `JSON_VALID` check, so the hashed bytes
+  are identical on both engines.
+- Triggers are created without a `DEFINER`, so the importing account owns them.
+  Some MySQL setups with binary logging need `log_bin_trust_function_creators=1`
+  (or SUPER) to create triggers. Ask the host if the import of `triggers.sql`
+  fails with error 1419.

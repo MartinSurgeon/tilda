@@ -1,0 +1,167 @@
+/* ==========================================================================
+   RUMA IT Support — design tokens + components
+   Build: npm run build   (outputs public/assets/css/app.css)
+   ========================================================================== */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Brand palette (as supplied) */
+    --color-light-green: #a0d67a;
+    --color-light-green-1: #afd693;
+    --color-white-smoke: #f5f5f5;
+    --color-white-smoke-1: #f6f6f6;
+    --color-white-smoke-2: #f7f7f7;
+    --color-white: #ffffff;
+    --color-teal: #0d8257;            /* primary */
+    --color-green: #0d840f;           /* success */
+    --color-charcoal: #545454;        /* body text */
+    --color-midnight-blue: #17449e;   /* secondary / links */
+    --color-cornflower-blue: #4d93e9; /* info accents */
+    --gradient-linear: linear-gradient(#0d8257, #0d8257);
+    --gradient-linear-1: linear-gradient(to right, #1b5e08, #0d8257);
+
+    /* Channel values for Tailwind (rgb(var(--rgb-x) / alpha)).
+       Contrast notes (WCAG AA, 4.5:1 text):
+       - teal/green pass on white (4.8) but NOT on white-smoke (4.4): use teal-darker for text on grey.
+       - cornflower fails as text (3.2): accents only; info text uses --rgb-info-text.
+       - light green fails as text (1.7): backgrounds/decoration only. */
+    --rgb-teal: 13 130 87;          /* #0d8257  white text 4.83 */
+    --rgb-teal-dark: 10 106 71;     /* #0a6a47  hover, white text 6.63 */
+    --rgb-teal-darker: 8 87 58;     /* #08573a  text on tint 7.63, on smoke 7.91 */
+    --rgb-teal-tint: 231 244 238;   /* #e7f4ee */
+    --rgb-green: 13 132 15;         /* #0d840f */
+    --rgb-green-text: 11 107 13;    /* #0b6b0d  on green-tint 5.97 */
+    --rgb-green-tint: 232 245 232;  /* #e8f5e8 */
+    --rgb-light-green: 160 214 122;
+    --rgb-light-green-1: 175 214 147;
+    --rgb-charcoal: 84 84 84;       /* #545454  7.57 on white, 6.95 on smoke */
+    --rgb-ink: 43 43 43;            /* #2b2b2b  headings, 12.99 on smoke */
+    --rgb-muted: 102 102 102;       /* #666666  5.74 on white, 5.27 on smoke */
+    --rgb-midnight: 23 68 158;      /* #17449e  8.91 on white */
+    --rgb-midnight-tint: 233 238 249;
+    --rgb-cornflower: 77 147 233;
+    --rgb-info-text: 26 95 180;     /* #1a5fb4  on info-tint 5.57 */
+    --rgb-info-tint: 234 242 253;   /* #eaf2fd */
+    --rgb-warning: 161 92 0;        /* #a15c00  5.19 on white */
+    --rgb-warning-text: 138 79 0;   /* #8a4f00  on warning-tint 5.87 */
+    --rgb-warning-tint: 253 241 220;/* #fdf1dc */
+    --rgb-danger: 180 35 24;        /* #b42318  6.57 on white, 5.75 on tint */
+    --rgb-danger-dark: 145 32 24;   /* #912018  hover */
+    --rgb-danger-tint: 253 236 234; /* #fdecea */
+    --rgb-neutral-text: 69 69 69;   /* #454545  on neutral-tint 8.19 */
+    --rgb-neutral-tint: 237 237 237;/* #ededed */
+    --rgb-white-smoke: 245 245 245;
+    --rgb-white-smoke-1: 246 246 246;
+    --rgb-white-smoke-2: 247 247 247;
+    --rgb-line: 226 226 226;        /* decorative dividers */
+    --rgb-line-strong: 138 138 138; /* #8a8a8a  form borders, 3.45:1 (UI ≥ 3:1) */
+  }
+
+  html { -webkit-text-size-adjust: 100%; }
+  body { @apply bg-smoke text-charcoal antialiased; }
+  h1, h2, h3, h4 { @apply text-ink; }
+  a { @apply text-midnight underline-offset-2; }
+  a:hover { @apply underline; }
+
+  /* One visible, consistent focus style for keyboard users. */
+  :focus-visible { @apply outline outline-2 outline-offset-2 outline-midnight; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  /* Buttons: every variant is ≥ 44px tall (Fitts's law, WCAG 2.5.5). */
+  .btn {
+    @apply inline-flex min-h-touch items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold
+           no-underline transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+  .btn:hover { @apply no-underline; }
+  .btn-primary   { @apply btn bg-teal text-white hover:bg-teal-dark; }
+  .btn-secondary { @apply btn border border-midnight bg-white text-midnight hover:bg-midnight-tint; }
+  .btn-ghost     { @apply btn text-charcoal hover:bg-smoke; }
+  .btn-danger    { @apply btn bg-danger text-white hover:bg-danger-dark; }
+  .btn-block     { @apply w-full; }
+  .btn-icon      { @apply inline-flex h-11 w-11 items-center justify-center rounded-lg text-charcoal hover:bg-smoke; }
+
+  .card        { @apply rounded-xl border border-line bg-white shadow-card; }
+  .card-body   { @apply p-4 sm:p-6; }
+  .card-header { @apply flex items-center justify-between gap-3 border-b border-line px-4 py-3 sm:px-6; }
+  .card-title  { @apply text-base font-semibold text-ink; }
+
+  .page-title    { @apply text-xl font-bold text-ink sm:text-2xl; }
+  .page-subtitle { @apply mt-1 text-sm text-muted; }
+  .section-title { @apply text-sm font-semibold uppercase tracking-wide text-muted; }
+
+  /* Forms — 16px text so iOS does not zoom on focus. */
+  .label       { @apply mb-1 block text-sm font-semibold text-ink; }
+  .label-optional { @apply font-normal text-muted; }
+  .input, .select, .textarea {
+    @apply block w-full min-h-touch rounded-lg border-line-strong bg-white px-3 py-2 text-base text-ink
+           placeholder:text-muted focus:border-teal focus:ring-2 focus:ring-teal/30;
+  }
+  .textarea { @apply min-h-[7rem]; }
+  .input[aria-invalid="true"], .select[aria-invalid="true"], .textarea[aria-invalid="true"] {
+    @apply border-danger focus:border-danger focus:ring-danger/30;
+  }
+  .checkbox    { @apply h-5 w-5 rounded border-line-strong text-teal focus:ring-teal/30; }
+  .hint        { @apply mt-1 text-sm text-muted; }
+  .field-error { @apply mt-1 flex items-start gap-1 text-sm font-medium text-danger; }
+
+  /* Badges: tint background + dark text + icon (never colour alone). */
+  .badge { @apply inline-flex items-center gap-1 whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-semibold; }
+  .badge-teal    { @apply badge bg-teal-tint text-teal-darker; }
+  .badge-success { @apply badge bg-green-tint text-green-text; }
+  .badge-info    { @apply badge bg-info-tint text-info-text; }
+  .badge-midnight{ @apply badge bg-midnight-tint text-midnight; }
+  .badge-warning { @apply badge bg-warning-tint text-warning-text; }
+  .badge-danger  { @apply badge bg-danger-tint text-danger; }
+  .badge-neutral { @apply badge bg-neutral-tint text-neutral-text; }
+
+  .alert { @apply flex items-start gap-3 rounded-lg border px-4 py-3 text-sm; }
+  .alert-success { @apply alert border-green/30 bg-green-tint text-green-text; }
+  .alert-info    { @apply alert border-cornflower/40 bg-info-tint text-info-text; }
+  .alert-warning { @apply alert border-warning/30 bg-warning-tint text-warning-text; }
+  .alert-danger  { @apply alert border-danger/30 bg-danger-tint text-danger; }
+
+  /* Navigation */
+  .nav-link {
+    @apply flex min-h-touch items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-charcoal no-underline hover:bg-smoke hover:no-underline;
+  }
+  .nav-link[aria-current="page"] { @apply bg-teal-tint font-semibold text-teal-darker; }
+  .bottom-nav-link {
+    @apply flex min-h-touch flex-1 flex-col items-center justify-center gap-0.5 px-1 py-1 text-[11px] font-medium text-charcoal no-underline hover:no-underline;
+  }
+  .bottom-nav-link[aria-current="page"] { @apply text-teal-darker; }
+
+  .skip-link {
+    @apply sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:shadow-raised;
+  }
+
+  .stat       { @apply card flex items-center gap-4 p-4; }
+  .stat-icon  { @apply flex h-11 w-11 shrink-0 items-center justify-center rounded-lg; }
+  .stat-value { @apply text-2xl font-bold text-ink; }
+  .stat-label { @apply text-sm text-muted; }
+
+  .avatar { @apply inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-teal-tint text-sm font-bold text-teal-darker; }
+
+  /* Data tables become stacked cards below md (see views using .responsive-table). */
+  .table { @apply w-full text-left text-sm; }
+  .table th { @apply border-b border-line px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted; }
+  .table td { @apply border-b border-line px-4 py-3 align-middle; }
+  .table tbody tr:last-child td { @apply border-b-0; }
+  .table tbody tr:hover { @apply bg-smoke-2; }
+}
+
+@layer utilities {
+  .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+}
