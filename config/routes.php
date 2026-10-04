@@ -9,7 +9,7 @@ use App\Controllers\Admin\UserController;
 use App\Controllers\AuthController;
 use App\Controllers\DashboardController;
 use App\Controllers\NotificationController;
-use App\Controllers\PlaceholderController;
+use App\Controllers\ReportController;
 use App\Controllers\TicketActionController;
 use App\Controllers\TicketController;
 
@@ -67,6 +67,10 @@ $router->get('/audit/export', [AuditController::class, 'export'], ['can' => 'aud
 $router->get('/audit/integrity', [AuditController::class, 'integrity'], ['can' => 'audit.verify']);
 $router->post('/audit/integrity', [AuditController::class, 'verify'], ['can' => 'audit.verify']);
 
+// Reports
+$router->get('/reports', [ReportController::class, 'index'], ['can' => 'report.view']);
+$router->get('/reports/export', [ReportController::class, 'export'], ['can' => 'report.export']);
+
 // Administration: settings
 $router->get('/admin/settings', [SettingsController::class, 'index'], ['can' => 'admin.settings']);
 $router->get('/admin/settings/categories', [SettingsController::class, 'categories'], ['can' => 'admin.settings']);
@@ -77,6 +81,3 @@ $router->post('/admin/settings/departments', [SettingsController::class, 'storeD
 $router->post('/admin/settings/departments/{id}', [SettingsController::class, 'updateDepartment'], ['can' => 'admin.settings']);
 $router->get('/admin/settings/priorities', [SettingsController::class, 'priorities'], ['can' => 'admin.settings']);
 $router->post('/admin/settings/priorities', [SettingsController::class, 'updatePriorities'], ['can' => 'admin.settings']);
-
-// Placeholders (replaced in later phases); permissions are already final.
-$router->get('/reports', [PlaceholderController::class, 'show'], ['can' => 'report.view']);

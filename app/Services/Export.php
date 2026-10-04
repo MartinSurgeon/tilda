@@ -34,13 +34,30 @@ final class Export
     }
 
     /**
-     * Branded PDF table report.
+     * Branded PDF of one table (audit log exports).
      * @param array<string, string> $meta  label => value lines under the title (filters, period)
      * @param array<int, array>     $rows  each row is a list of cell values in header order
      */
-    public static function pdf(string $filename, string $title, array $meta, array $headers, array $rows, string $orientation = 'landscape', string $extraHtml = ''): never
+    public static function pdf(string $filename, string $title, array $meta, array $headers, array $rows, string $orientation = 'landscape'): never
     {
-        $html = self::pdfHtml($title, $meta, $headers, $rows, $extraHtml);
+        $head = implode('', array_map(static fn ($h) => '<th>' . e($h) . '</th>', $headers));
+        $body = '';
+        foreach ($rows as $row) {
+            $body .= '<tr>' . implode('', array_map(static fn ($c) => '<td>' . nl2br(e((string) $c)) . '</td>', $row)) . '</tr>';
+        }
+        if ($body === '') {
+            $body = '<tr><td colspan="' . count($headers) . '">No records match these filters.</td></tr>';
+        }
+        self::document($filename, $title, $meta, "<table class=\"data\"><thead><tr>{$head}</tr></thead><tbody>{$body}</tbody></table>", $orientation);
+    }
+
+    /**
+     * Branded PDF around any body HTML (the caller escapes its own content).
+     * Header: logo, hospital name, generation time and person. Footer: page numbers.
+     */
+    public static function document(string $filename, string $title, array $meta, string $bodyHtml, string $orientation = 'portrait'): never
+    {
+        $html = self::wrap($title, $meta, $bodyHtml);
 
         $options = new Options();
         $options->set('isRemoteEnabled', false);   // never fetch URLs while rendering
@@ -68,7 +85,8 @@ final class Export
         exit;
     }
 
-    private static function pdfHtml(string $title, array $meta, array $headers, array $rows, string $extraHtml): string
+    /** Full HTML document for Dompdf. Public so the layout can be previewed in a browser. */
+    public static function wrap(string $title, array $meta, string $bodyHtml): string
     {
         $safeTitle = e($title);
         $org = e(setting('org.name', 'RUMA Hospital'));
@@ -80,15 +98,6 @@ final class Export
         foreach ($meta as $label => $value) {
             $metaHtml .= '<tr><th>' . e($label) . '</th><td>' . e($value) . '</td></tr>';
         }
-        $head = implode('', array_map(static fn ($h) => '<th>' . e($h) . '</th>', $headers));
-        $body = '';
-        foreach ($rows as $row) {
-            $body .= '<tr>' . implode('', array_map(static fn ($c) => '<td>' . nl2br(e((string) $c)) . '</td>', $row)) . '</tr>';
-        }
-        if ($body === '') {
-            $body = '<tr><td colspan="' . count($headers) . '">No records match these filters.</td></tr>';
-        }
-
         return <<<HTML
 <!doctype html><html><head><meta charset="utf-8"><style>
   @page { margin: 28px 28px 40px 28px; }
@@ -106,6 +115,9 @@ final class Export
   table.data th { background: #e7f4ee; color: #08573a; text-align: left; padding: 4px 5px; font-size: 7.5px; border-bottom: 1px solid #0d8257; }
   table.data td { padding: 3px 5px; border-bottom: 0.5px solid #e2e2e2; vertical-align: top; word-wrap: break-word; }
   table.data tr:nth-child(even) td { background: #f7f7f7; }
+  table.data tr { page-break-inside: avoid; }
+  h2 { font-size: 11px; margin: 16px 0 6px; color: #08573a; page-break-after: avoid; }
+  table.data .num, .num { text-align: right; }
   .foot { margin-top: 10px; color: #666666; font-size: 7px; }
 </style></head><body>
 <table class="brand"><tr>
@@ -116,8 +128,7 @@ final class Export
 <div class="bar"></div>
 <h1>{$safeTitle}</h1>
 <table class="meta">{$metaHtml}</table>
-{$extraHtml}
-<table class="data"><thead><tr>{$head}</tr></thead><tbody>{$body}</tbody></table>
+{$bodyHtml}
 <p class="foot">Confidential: internal use only. This document must not contain patient information.</p>
 </body></html>
 HTML;

@@ -4,7 +4,9 @@
  * (so text never scales); the legend and the table are server-rendered, so
  * every value is reachable without the chart or hover.
  * @var array<string, array{opened: int, resolved: int}> $trend
+ * @var ?string $caption  what the period is, for screen readers (default: last 14 days)
  */
+$caption ??= 'last 14 days';
 $labels = array_map(static fn ($d) => date('j M', strtotime($d)), array_keys($trend));
 $opened = array_column($trend, 'opened');
 $resolved = array_column($trend, 'resolved');
@@ -24,7 +26,7 @@ $sumR = array_sum($resolved);
 </div>
 
 <div class="trend-chart relative" data-chart="<?= e(json_encode($chart)) ?>" tabindex="0" role="img"
-     aria-label="Line chart, last 14 days: <?= $sumO ?> tickets opened and <?= $sumR ?> resolved. Use left and right arrow keys to read each day.">
+     aria-label="Line chart, <?= e($caption) ?>: <?= $sumO ?> tickets opened and <?= $sumR ?> resolved. Use left and right arrow keys to read each day.">
     <noscript><p class="text-sm text-muted">Chart needs JavaScript. See the table below.</p></noscript>
 </div>
 

@@ -4,9 +4,9 @@ Internal ticketing for **RUMA Hospital (ruma.hospital)**. Staff report hardware
 and software problems, the IT team resolves them, management receives monthly
 reports, and every action is recorded in a tamper-evident audit trail.
 
-> **Status: Phase 4 (Audit) complete.** Activity log, database change log with
-> old/new values, append-only protection, hash-chain integrity check, daily
-> fingerprint email, PDF/CSV export. See [AUDIT.md](AUDIT.md). Next: Phase 5 (monthly reports).
+> **Status: Phase 5 (Reports) complete.** Monthly maintenance report with filters,
+> comparison to the previous period, charts and branded PDF/CSV export.
+> Next: Phase 6 (hardening, accessibility pass, deployment guide).
 
 - **Stack:** PHP 8.1+ (no framework), MySQL 8 / MariaDB 10.4+, Tailwind CSS (pre-built), vanilla JS
 - **Runs on:** cPanel shared hosting or any VPS. Node is only needed on a developer machine.
@@ -37,6 +37,27 @@ Open <http://127.0.0.1:8000>.
 
 **CSS:** `public/assets/css/app.css` is committed. Rebuild only after changing
 classes in views: `npm install` once, then `npm run build` (or `npm run watch`).
+
+## Demo data
+
+To review dashboards and reports with realistic history (about 180 tickets over 75 days,
+plus 8 demo staff accounts):
+
+```bash
+php tools/seed-demo-tickets.php
+```
+
+It refuses to run when `APP_ENV=production`. Everything it creates is recorded in the audit
+trail as `demo-seed`, so use a fresh database for go-live.
+
+## Reports
+
+*Reports* (IT Manager, Management) shows the monthly maintenance report: plain-language summary,
+key figures compared with the previous month, daily trend, breakdowns by priority, category
+and department, top recurring issues, repeat locations, technician workload and today's open
+backlog. Filter by month or custom dates (up to a year), department, category, priority,
+current status or technician. *Download PDF* gives a branded A4 report; *CSV* gives every section
+in one sheet. Viewing and exporting are recorded in the audit log.
 
 ## Demo accounts
 
