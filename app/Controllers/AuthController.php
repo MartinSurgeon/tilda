@@ -46,12 +46,7 @@ final class AuthController
             Response::redirect('/account/password');
         }
 
-        $intended = Session::pull('intended', '/');
-        // Only same-site relative paths, never "//evil.example".
-        if (!is_string($intended) || !str_starts_with($intended, '/') || str_starts_with($intended, '//')) {
-            $intended = '/';
-        }
-        Response::redirect($intended);
+        Response::redirect(safe_path(Session::pull('intended', '/')));
     }
 
     public function logout(): void

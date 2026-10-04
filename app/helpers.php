@@ -264,3 +264,21 @@ function field_error(string $name): string
     }
     return '<p class="field-error" id="' . e($name) . '-error">' . icon('alert-circle', 'mt-0.5 h-4 w-4 shrink-0') . '<span>' . e($message) . '</span></p>';
 }
+
+/** For single-line fields (titles, names, locations): collapse line breaks and runs of spaces. */
+function one_line(string $value): string
+{
+    return trim((string) preg_replace('/\s+/u', ' ', $value));
+}
+
+/**
+ * Only same-site relative paths are safe redirect targets. Rejects "//host",
+ * "/\host" (browsers treat both as another site) and anything with a scheme.
+ */
+function safe_path(mixed $path, string $fallback = '/'): string
+{
+    if (!is_string($path) || $path === '' || $path[0] !== '/' || preg_match('#^/[/\\\\]#', $path) || preg_match('/[\x00-\x1F]/', $path)) {
+        return $fallback;
+    }
+    return $path;
+}

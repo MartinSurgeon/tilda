@@ -33,6 +33,10 @@ final class PasswordPolicy
         if (mb_strlen($password) < self::MIN_LENGTH) {
             $problems[] = 'Use at least ' . self::MIN_LENGTH . ' characters.';
         }
+        // bcrypt only uses the first 72 bytes; refuse longer so nothing is silently ignored.
+        if (strlen($password) > 72) {
+            $problems[] = 'Use at most 72 characters (fewer if you use accented letters or symbols).';
+        }
 
         $classes = (int) preg_match('/[a-z]/', $password)
             + (int) preg_match('/[A-Z]/', $password)

@@ -41,7 +41,7 @@
 
 <?php if (config('env') === 'local'): ?>
     <details class="mt-8 rounded-lg border border-line bg-smoke-2 p-4 text-sm">
-        <summary class="cursor-pointer font-semibold text-ink">Demo accounts (local only)</summary>
+        <summary class="flex min-h-touch cursor-pointer items-center font-semibold text-ink">Demo accounts (local only)</summary>
         <p class="mt-2 text-muted">Password for all: <code class="font-mono text-ink">Ruma@2026!</code></p>
         <ul class="mt-2 space-y-1" role="list">
             <li><code>admin@ruma.hospital</code> · IT Manager</li>

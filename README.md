@@ -4,9 +4,10 @@ Internal ticketing for **RUMA Hospital (ruma.hospital)**. Staff report hardware
 and software problems, the IT team resolves them, management receives monthly
 reports, and every action is recorded in a tamper-evident audit trail.
 
-> **Status: Phase 5 (Reports) complete.** Monthly maintenance report with filters,
-> comparison to the previous period, charts and branded PDF/CSV export.
-> Next: Phase 6 (hardening, accessibility pass, deployment guide).
+> **Status: complete (all 6 build phases).** Ticketing, live dashboards, notifications,
+> email, SLA tracking, audit trail with integrity checks, monthly reports and exports.
+> See [SECURITY.md](SECURITY.md) and [AUDIT.md](AUDIT.md) for the controls, and
+> [Deployment](#deployment) to go live.
 
 - **Stack:** PHP 8.1+ (no framework), MySQL 8 / MariaDB 10.4+, Tailwind CSS (pre-built), vanilla JS
 - **Runs on:** cPanel shared hosting or any VPS. Node is only needed on a developer machine.
@@ -145,19 +146,104 @@ views/           layouts, partials, components, pages
 storage/         uploads, logs, sessions (never web-served)
 ```
 
-## Deploying to cPanel (summary)
+## Deployment
 
-A full guide comes in Phase 6. The essentials:
+### Requirements
 
-1. Upload the project **outside** `public_html` (e.g. `/home/USER/ruma`), including `vendor/`.
-2. Point the domain or subdomain document root at `/home/USER/ruma/public`.
-   If you cannot change it, copy `public/` into `public_html` and change the
-   `require` path in `public_html/index.php` to point at `/home/USER/ruma/app/bootstrap.php`.
-3. Create the database and user in *MySQL Databases*, then import the four SQL
-   files in phpMyAdmin (see `database/MIGRATIONS.md`).
-4. Create `.env` from `.env.example` with `APP_ENV=production`, `APP_DEBUG=false`,
-   `SESSION_SECURE=true`, and make sure HTTPS is enabled (AutoSSL).
-5. Make `storage/` writable by PHP (usually 755 is enough on cPanel).
+- PHP 8.1+ with `pdo_mysql`, `mbstring`, `fileinfo`, `gd` (with WebP), `openssl`, `dom`; `exif` recommended
+- MySQL 8.0.16+ or MariaDB 10.4+, with permission to create triggers
+- HTTPS
+- `upload_max_filesize` ≥ `UPLOAD_MAX_MB`, `post_max_size` ≥ 3 × `UPLOAD_MAX_MB`
+
+### Build the release (on your computer)
+
+```bash
+php tools/composer.phar install --no-dev --optimize-autoloader
+npm install && npm run build        # only if views or CSS changed
+```
+
+Upload everything **except** `node_modules/`, `.git/`, `.env` and the contents of `storage/`
+(keep the empty `storage/*` folders and `storage/.htaccess`).
+
+### cPanel (shared hosting)
+
+1. **Files:** in *File Manager*, upload the project to a folder **outside** `public_html`,
+   for example `/home/CPANELUSER/ruma`.
+2. **Document root:** in *Domains*, create the site (for example `it.ruma.hospital`) and set its
+   document root to `/home/CPANELUSER/ruma/public`.
+   *If the document root cannot be changed:* copy the contents of `public/` into `public_html`,
+   then edit `public_html/index.php` so its `require` line reads
+   `require '/home/CPANELUSER/ruma/app/bootstrap.php';`. Never upload `app/`, `config/`,
+   `storage/`, `vendor/` or `.env` into `public_html`.
+3. **PHP:** in *MultiPHP Manager* choose PHP 8.1 or newer. In *MultiPHP INI Editor* set
+   `upload_max_filesize = 8M` and `post_max_size = 24M`. In *Select PHP Version → Extensions*,
+   tick the extensions listed above.
+4. **Database:** in *MySQL Databases*, create a database and a user with a strong password, and
+   add the user with **All Privileges** (cPanel cannot grant less per table; see AUDIT.md).
+5. **Import:** in *phpMyAdmin*, select the database and *Import* in this order:
+   `schema.sql`, `triggers.sql`, `change_triggers.sql`, `seed.sql`.
+   If `triggers.sql` fails with error 1419, ask the host to allow triggers for your account.
+6. **Configure:** copy `.env.example` to `.env` in `/home/CPANELUSER/ruma` and set:
+   `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL=https://it.ruma.hospital`,
+   `APP_TIMEZONE` (for example `Africa/Accra`), `SESSION_SECURE=true`, the `DB_*` values
+   (cPanel prefixes names, e.g. `cpuser_ruma`), and the `MAIL_*` values from
+   *Email Accounts → Connect Devices*. Set `MAIL_ENABLED=true`.
+7. **HTTPS:** check *SSL/TLS Status* shows AutoSSL for the domain.
+8. **Cron:** in *Cron Jobs*, add (every 5 minutes):
+   ```
+   */5 * * * * /usr/local/bin/php /home/CPANELUSER/ruma/tools/cron.php >> /home/CPANELUSER/ruma/storage/logs/cron.log 2>&1
+   ```
+9. **Check:** in *Terminal* (or via a one-off cron job), run `php /home/CPANELUSER/ruma/tools/check.php`.
+10. **Go live:** follow the checklist below.
+
+### VPS (Ubuntu, Apache or Nginx)
+
+```bash
+sudo apt install php8.2-fpm php8.2-mysql php8.2-mbstring php8.2-gd php8.2-xml php8.2-curl php8.2-exif mariadb-server
+sudo mkdir -p /var/www/ruma && sudo chown -R $USER /var/www/ruma     # upload the release here
+sudo chown -R www-data:www-data /var/www/ruma/storage && sudo chmod -R 750 /var/www/ruma/storage
+sudo mysql < /var/www/ruma/database/grants.sql                      # edit the passwords first
+mysql -u ruma_owner -p ruma_itsm < database/schema.sql              # then triggers, change_triggers, seed
+```
+
+On a VPS, put the **`ruma_app`** account (SELECT/INSERT only on audit tables) in `.env`, and use
+`ruma_owner` only for imports. Nginx site:
+
+```nginx
+server {
+    server_name it.ruma.hospital;
+    root /var/www/ruma/public;
+    index index.php;
+    client_max_body_size 24m;
+    location / { try_files $uri /index.php?$query_string; }
+    location ~ \.php$ { include snippets/fastcgi-php.conf; fastcgi_pass unix:/run/php/php8.2-fpm.sock; }
+    location ~ /\. { deny all; }
+    location ~* \.(css|js|svg|png|woff2)$ { expires 1y; add_header Cache-Control "public, immutable"; }
+}
+```
+
+With Apache, set `DocumentRoot /var/www/ruma/public` and `AllowOverride All` (the included
+`.htaccess` files handle routing). Then add HTTPS with `certbot`, and the cron line from above
+for the `www-data` user.
+
+### Go-live checklist
+
+- [ ] `php tools/check.php` reports **0 failures**
+- [ ] Signed in as `admin@ruma.hospital`, created a personal IT Manager account, then deactivated
+      every demo account (it fails the check while any is active)
+- [ ] Departments, categories and SLA targets reviewed under *Settings*
+- [ ] Test email received (report a test ticket, then wait for cron)
+- [ ] First daily audit fingerprint email received by the auditor
+- [ ] Database backups scheduled (cPanel *Backup*, or `mysqldump --single-transaction --routines --triggers` daily) and stored off the server
+- [ ] Staff told the address and the "no patient data" rule
+
+### Upgrading
+
+1. Back up the database and the `storage/uploads` folder.
+2. Upload the new release over the old one (keep `.env` and `storage/`).
+3. Apply any new files in `database/migrations/` (see `database/MIGRATIONS.md`). If the schema
+   changed, re-import `change_triggers.sql`.
+4. Run `php tools/check.php`.
 
 ## Troubleshooting
 

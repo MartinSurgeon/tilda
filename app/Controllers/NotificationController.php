@@ -49,7 +49,7 @@ final class NotificationController
         }
         DB::run('UPDATE notifications SET read_at = COALESCE(read_at, NOW()) WHERE id = ?', [$id]);
         $url = (string) $n['url'];
-        Response::redirect(str_starts_with($url, '/') && !str_starts_with($url, '//') ? $url : '/notifications');
+        Response::redirect(safe_path($url, '/notifications'));
     }
 
     public function readAll(): void

@@ -39,6 +39,8 @@ final class TicketController
     {
         $user = Auth::user();
         $data = Request::only(['category_id', 'subcategory_id', 'title', 'description', 'priority_id', 'department_id', 'location']);
+        $data['title'] = one_line($data['title']);
+        $data['location'] = one_line($data['location']);
 
         $v = Validator::make($data, [
             'category_id'   => 'required|int',
@@ -68,6 +70,13 @@ final class TicketController
         }
         if (!DB::value('SELECT 1 FROM departments WHERE id = ? AND is_active = 1', [(int) $data['department_id']])) {
             $v->addError('department_id', 'Please choose your department.');
+        }
+
+        // Flood protection: a real person rarely reports more than a few problems an hour.
+        $recent = (int) DB::value('SELECT COUNT(*) FROM tickets WHERE requester_id = ? AND created_at > NOW() - INTERVAL 1 HOUR', [$user['id']]);
+        if ($recent >= 20) {
+            AuditLogger::log('security.rate_limited', 'ticket', null, 'Ticket creation limit reached', ['last_hour' => $recent]);
+            $v->addError('title', 'You have reported a lot of problems in the last hour. Please wait a little, or phone the IT help desk if it is urgent.');
         }
 
         $files = Uploads::fromRequest('attachments');

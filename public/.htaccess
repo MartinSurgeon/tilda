@@ -7,9 +7,16 @@ Options -Indexes -MultiViews
 <FilesMatch "^\.">
     Require all denied
 </FilesMatch>
+
+# Compress text responses (HTML, CSS, JS, JSON, SVG).
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml text/csv
+</IfModule>
+
+# Assets are linked with ?v=<file time>, so they can be cached for a year.
 <IfModule mod_headers.c>
     <FilesMatch "\.(css|js|svg|png|woff2)$">
-        Header set Cache-Control "public, max-age=604800"
+        Header set Cache-Control "public, max-age=31536000, immutable"
         Header set X-Content-Type-Options "nosniff"
     </FilesMatch>
 </IfModule>

@@ -13,6 +13,13 @@ use PDOStatement;
 final class DB
 {
     private static ?PDO $pdo = null;
+    private static int $queries = 0;
+
+    /** Number of queries this request (sent as X-Debug-Queries when APP_DEBUG=true). */
+    public static function queryCount(): int
+    {
+        return self::$queries;
+    }
 
     public static function pdo(): PDO
     {
@@ -34,6 +41,7 @@ final class DB
 
     public static function run(string $sql, array $params = []): PDOStatement
     {
+        self::$queries++;
         $stmt = self::pdo()->prepare($sql);
         foreach ($params as $key => $value) {
             $name = is_int($key) ? $key + 1 : $key;

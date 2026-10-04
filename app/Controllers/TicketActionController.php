@@ -77,7 +77,7 @@ final class TicketActionController
             Gate::deny('ticket.priority');
         }
         $priorityId = (int) Request::input('priority_id', 0);
-        $reason = mb_substr((string) Request::input('reason', ''), 0, 300);
+        $reason = mb_substr(one_line((string) Request::input('reason', '')), 0, 300);
         if ($reason === '') {
             $this->fail($id, 'Please say why the priority is changing.');
         }

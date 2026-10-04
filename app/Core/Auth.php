@@ -78,6 +78,7 @@ final class Auth
         Session::regenerate();
         Csrf::rotate();
         Session::set('user_id', (int) $user['id']);
+        Session::set('auth_at', time());
         DB::run('UPDATE users SET last_login_at = NOW(), locked_until = NULL WHERE id = ?', [$user['id']]);
         self::$loaded = false;
         DB::setContext((int) $user['id'], Request::ip(), Request::userAgent());
@@ -102,7 +103,7 @@ final class Auth
             $id = Session::get('user_id');
             self::$user = $id ? DB::one(
                 'SELECT u.id, u.full_name, u.email, u.role_id, u.department_id, u.job_title, u.phone,
-                        u.must_change_password, u.is_active, r.slug AS role, r.name AS role_name,
+                        u.must_change_password, u.is_active, u.password_changed_at, r.slug AS role, r.name AS role_name,
                         d.name AS department_name
                  FROM users u
                  JOIN roles r ON r.id = u.role_id
@@ -110,6 +111,16 @@ final class Auth
                  WHERE u.id = ?',
                 [$id]
             ) : null;
+            // A password change or admin reset ends every session that signed in before it.
+            $staleSession = self::$user && self::$user['password_changed_at'] !== null
+                && strtotime(self::$user['password_changed_at']) >= (int) Session::get('auth_at', 0);
+            if ($staleSession) {
+                Session::destroy();
+                session_id(session_create_id());
+                session_start();
+                Session::flash('warning', 'Your password was changed, so you have been signed out. Please sign in again.');
+                self::$user = null;
+            }
             if (self::$user && (int) self::$user['is_active'] !== 1) {
                 Session::destroy();
                 self::$user = null;

@@ -199,6 +199,8 @@ CREATE TABLE tickets (
     KEY idx_tickets_created (created_at),
     KEY idx_tickets_updated (updated_at),
     KEY idx_tickets_sla (status, resolve_due_at),
+    KEY idx_tickets_resolved (resolved_at),           -- monthly reports
+    KEY idx_tickets_closed (closed_at),
     CONSTRAINT fk_tickets_category    FOREIGN KEY (category_id)    REFERENCES categories (id),
     CONSTRAINT fk_tickets_subcategory FOREIGN KEY (subcategory_id) REFERENCES categories (id),
     CONSTRAINT fk_tickets_department  FOREIGN KEY (department_id)  REFERENCES departments (id),

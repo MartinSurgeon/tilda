@@ -39,6 +39,9 @@ final class Response
     {
         http_response_code($status);
         header('Content-Type: text/html; charset=utf-8');
+        if (config('debug')) {
+            header('X-Debug-Queries: ' . DB::queryCount());
+        }
         echo $html;
         exit;
     }

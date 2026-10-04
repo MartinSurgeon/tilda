@@ -14,7 +14,7 @@
 <a class="skip-link" href="#main">Skip to main content</a>
 <div class="flex min-h-full">
     <!-- Brand panel (desktop) -->
-    <div class="relative hidden w-[44%] flex-col justify-between bg-brand-linear-1 p-12 text-white lg:flex">
+    <aside class="relative hidden w-[44%] flex-col justify-between bg-brand-linear-1 p-12 text-white lg:flex" aria-label="About this service">
         <div class="flex items-center gap-3">
             <img src="<?= e(asset('img/logo-mark.svg')) ?>" alt="" class="h-11 w-11 rounded-xl ring-2 ring-white/30">
             <span class="text-lg font-bold">RUMA Hospital</span>
@@ -28,7 +28,7 @@
             </ul>
         </div>
         <p class="text-sm text-white">ruma.hospital · Internal use only</p>
-    </div>
+    </aside>
 
     <main id="main" class="flex flex-1 flex-col justify-center px-4 py-10 sm:px-8">
         <div class="mx-auto w-full max-w-sm">

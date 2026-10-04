@@ -64,7 +64,7 @@ final class SettingsController
 
     private function categoryInput(?array $existing = null): array
     {
-        $in = Request::only(['parent_id', 'name', 'description', 'icon', 'sort_order']);
+        $in = array_map('one_line', Request::only(['parent_id', 'name', 'description', 'icon', 'sort_order']));
         $parentId = $existing ? $existing['parent_id'] : ($in['parent_id'] !== '' ? (int) $in['parent_id'] : null);
 
         $v = Validator::make($in, ['name' => 'required|max:100', 'description' => 'max:255', 'sort_order' => 'int']);
@@ -128,7 +128,7 @@ final class SettingsController
 
     private function departmentInput(int $ignoreId = 0): array
     {
-        $in = Request::only(['name', 'code']);
+        $in = array_map('one_line', Request::only(['name', 'code']));
         $in['code'] = strtoupper($in['code']);
         $v = Validator::make($in, ['name' => 'required|max:100', 'code' => 'required|max:20'], ['code' => 'Short code']);
         if (!preg_match('/^[A-Z0-9_-]*$/', $in['code'])) {
@@ -167,7 +167,7 @@ final class SettingsController
 
         foreach ($before as $id => $old) {
             $r = $rows[$id] ?? [];
-            $name = trim((string) ($r['name'] ?? ''));
+            $name = one_line(Request::clean((string) ($r['name'] ?? '')));
             $response = (int) ($r['response_minutes'] ?? 0);
             $resolutionHours = (float) ($r['resolution_hours'] ?? 0);
             $resolution = (int) round($resolutionHours * 60);
@@ -186,7 +186,7 @@ final class SettingsController
                 $errors[] = "{$old['name']}: warning point must be between 50% and 95%.";
             }
             $clean[$id] = [
-                'name' => $name, 'description' => mb_substr(trim((string) ($r['description'] ?? '')), 0, 255),
+                'name' => $name, 'description' => mb_substr(one_line(Request::clean((string) ($r['description'] ?? ''))), 0, 255),
                 'response_minutes' => $response, 'resolution_minutes' => $resolution, 'warn_percent' => $warn,
             ];
         }

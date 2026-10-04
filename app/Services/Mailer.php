@@ -37,7 +37,7 @@ final class Mailer
         $mail->CharSet = PHPMailer::CHARSET_UTF8;
         $mail->setFrom($cfg['from'], $cfg['from_name']);
         $mail->addAddress($to, $name);
-        $mail->Subject = $subject;
+        $mail->Subject = one_line($subject); // never allow header line breaks
         $mail->isHTML(true);
         $mail->Body = $html;
         $mail->AltBody = $text;

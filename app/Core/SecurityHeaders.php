@@ -17,6 +17,7 @@ final class SecurityHeaders
         header('Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()');
         header('Cross-Origin-Opener-Policy: same-origin');
         header('Cross-Origin-Resource-Policy: same-origin');
+        header('X-Permitted-Cross-Domain-Policies: none');
         if (Request::isHttps()) {
             header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
         }

@@ -243,7 +243,7 @@ $maxIssue = max(1, ...array_map(static fn ($c) => (int) $c['n'], $r['topIssues']
                         <li class="flex flex-col gap-1 px-4 py-3 sm:flex-row sm:items-center sm:gap-3">
                             <div class="min-w-0 flex-1">
                                 <?php if (can('ticket.view_all')): ?>
-                                    <a href="<?= e(url('/tickets/' . $t['id'])) ?>" class="font-semibold text-ink"><?= e($t['title']) ?></a>
+                                    <a href="<?= e(url('/tickets/' . $t['id'])) ?>" class="inline-flex min-h-touch items-center font-semibold text-ink"><?= e($t['title']) ?></a>
                                 <?php else: ?>
                                     <span class="font-semibold text-ink"><?= e($t['title']) ?></span>
                                 <?php endif; ?>

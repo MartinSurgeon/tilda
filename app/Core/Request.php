@@ -37,13 +37,13 @@ final class Request
     public static function input(string $key, mixed $default = null): mixed
     {
         $value = $_POST[$key] ?? $default;
-        return is_string($value) ? trim($value) : $value;
+        return is_string($value) ? self::clean($value) : $value;
     }
 
     public static function query(string $key, mixed $default = null): mixed
     {
         $value = $_GET[$key] ?? $default;
-        return is_string($value) ? trim($value) : $value;
+        return is_string($value) ? self::clean($value) : $value;
     }
 
     /** Only the listed POST fields, trimmed. Missing keys become ''. */
@@ -52,9 +52,15 @@ final class Request
         $out = [];
         foreach ($keys as $key) {
             $value = $_POST[$key] ?? '';
-            $out[$key] = is_string($value) ? trim($value) : $value;
+            $out[$key] = is_string($value) ? self::clean($value) : $value;
         }
         return $out;
+    }
+
+    /** Trim and drop invisible control characters (keeps tab and line breaks for multi-line text). */
+    public static function clean(string $value): string
+    {
+        return trim((string) preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/u', '', $value));
     }
 
     public static function header(string $name): ?string

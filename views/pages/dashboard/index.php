@@ -40,7 +40,7 @@ $has = static fn (string $s) => in_array($s, $sections, true);
             <h2 id="awaiting-title" class="font-semibold text-info-text">IT says <?= count($awaiting) === 1 ? 'this is' : 'these are' ?> fixed. Please confirm.</h2>
             <ul class="mt-2 space-y-1" role="list">
                 <?php foreach ($awaiting as $a): ?>
-                    <li><a href="<?= e(url('/tickets/' . $a['id'])) ?>" class="font-semibold text-midnight"><?= e($a['ref']) ?></a> · <?= e($a['title']) ?></li>
+                    <li><a href="<?= e(url('/tickets/' . $a['id'])) ?>" class="inline-flex min-h-touch items-center font-semibold text-midnight"><?= e($a['ref']) ?></a> · <?= e($a['title']) ?></li>
                 <?php endforeach; ?>
             </ul>
         </div>
@@ -68,7 +68,7 @@ $has = static fn (string $s) => in_array($s, $sections, true);
     <section id="live-queue" data-live aria-labelledby="queue-title">
         <div class="mb-3 flex items-center justify-between">
             <h2 id="queue-title" class="section-title">Needs attention</h2>
-            <a href="<?= e(url('/tickets')) ?>" class="text-sm font-semibold">Open queue</a>
+            <a href="<?= e(url('/tickets')) ?>" class="inline-flex min-h-touch items-center text-sm font-semibold">Open queue</a>
         </div>
         <?php if (!$has('overview')): $q = $queue; ?>
             <div class="mb-3 grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -176,7 +176,7 @@ $has = static fn (string $s) => in_array($s, $sections, true);
     <section id="live-mine" data-live aria-labelledby="mine-title" <?= $has('overview') && !$myTickets ? 'hidden' : '' ?>>
         <div class="mb-3 flex items-center justify-between">
             <h2 id="mine-title" class="section-title">Tickets I raised</h2>
-            <?php if ($myTickets): ?><a href="<?= e(url('/tickets/mine')) ?>" class="text-sm font-semibold">View all</a><?php endif; ?>
+            <?php if ($myTickets): ?><a href="<?= e(url('/tickets/mine')) ?>" class="inline-flex min-h-touch items-center text-sm font-semibold">View all</a><?php endif; ?>
         </div>
         <div class="card">
             <?php if (!$myTickets): ?>
@@ -210,7 +210,7 @@ $has = static fn (string $s) => in_array($s, $sections, true);
     <section id="live-audit" data-live aria-labelledby="audit-title">
         <div class="mb-3 flex items-center justify-between">
             <h2 id="audit-title" class="section-title">Audit trail today</h2>
-            <a href="<?= e(url('/audit')) ?>" class="text-sm font-semibold">Open audit log</a>
+            <a href="<?= e(url('/audit')) ?>" class="inline-flex min-h-touch items-center text-sm font-semibold">Open audit log</a>
         </div>
         <div class="grid grid-cols-2 gap-3 lg:grid-cols-3">
             <?= View::partial('components/stat', ['label' => 'Events recorded', 'value' => $auditToday, 'icon' => 'shield-check', 'tone' => 'bg-midnight-tint text-midnight']) ?>

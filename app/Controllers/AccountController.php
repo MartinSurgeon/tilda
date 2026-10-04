@@ -78,6 +78,10 @@ final class AccountController
         ]);
 
         Session::regenerate();
+        // Keep this session: mark it as signed in just after the change. Every other
+        // session for the account signed in at or before it, so Auth::user() ends them.
+        $changedAt = strtotime((string) DB::value('SELECT password_changed_at FROM users WHERE id = ?', [$user['id']]));
+        Session::set('auth_at', $changedAt + 1);
         Csrf::rotate();
         Auth::refresh();
         Session::flash('success', 'Your password has been changed.');

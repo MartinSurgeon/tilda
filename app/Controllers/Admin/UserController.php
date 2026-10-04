@@ -159,7 +159,8 @@ final class UserController
     {
         $user = $this->find($id);
         $temporary = $this->temporaryPassword();
-        DB::run('UPDATE users SET password_hash = ?, must_change_password = 1 WHERE id = ?',
+        // password_changed_at also signs the person out everywhere (see Auth::user()).
+        DB::run('UPDATE users SET password_hash = ?, must_change_password = 1, password_changed_at = NOW() WHERE id = ?',
             [password_hash($temporary, PASSWORD_DEFAULT, ['cost' => 12]), $id]);
         AuditLogger::log('user.password_reset', 'user', $id, "Reset password for {$user['email']}");
 
@@ -186,6 +187,9 @@ final class UserController
     {
         $data = Request::only(self::FIELDS);
         $data['email'] = mb_strtolower((string) $data['email']);
+        foreach (['full_name', 'phone', 'job_title'] as $k) {
+            $data[$k] = one_line((string) $data[$k]);
+        }
         $data['is_active'] = isset($_POST['is_active']) ? '1' : '0';
 
         $v = Validator::make($data, [
