@@ -128,6 +128,17 @@ IT workstations, allow autoplay for the site once: in Edge or Chrome, *Settings 
 Media autoplay → Allow* for `it.ruma.hospital`, or centrally with the **AutoplayAllowlist** group
 policy (both browsers support it).
 
+## Display and shortcuts
+
+- **Night-shift mode:** *My account → Display* offers Day, Night shift (dark, low-glare) or Match device.
+  The choice is saved per person, so a shared ward PC follows whoever signs in. There is also a one-click
+  switch in the account menu and the phone *More* menu. All colours meet WCAG AA in both modes.
+- **Keyboard shortcuts:** press `?` for the list (`j`/`k` move through tickets, `t` takes, `r` replies,
+  `g` then `q` opens the queue, and more). On by default for IT staff, off for others; switch under
+  *My account → Keyboard shortcuts*. They never fire while typing.
+- **Patient-data warning:** the report form and reply boxes warn (but never block) when text looks like a
+  record number, date of birth or a person's name.
+
 ## Background jobs (cron)
 
 Run `tools/cron.php` every 5 minutes. In cPanel → *Cron Jobs*:
