@@ -42,18 +42,18 @@
         <div class="card-header"><h2 id="sound-title" class="card-title">Sound</h2></div>
         <form method="post" action="<?= e(url('/account/sound')) ?>" class="card-body space-y-4">
             <?= csrf_field() ?>
-            <p class="text-sm">A soft chime when a new notification arrives while this system is open, even in a background tab.
-                Urgent updates (Critical tickets and SLA warnings) play a brighter chime twice. The chimes are deliberately unlike medical alarms.</p>
+            <p class="text-sm">Plays the notification sound when something new arrives while this system is open, even in a background tab.
+                Urgent updates (Critical tickets and SLA warnings) play it twice, louder.</p>
             <label class="flex min-h-touch cursor-pointer items-center gap-3 rounded-lg px-2 hover:bg-smoke-2">
                 <input type="checkbox" name="sound" value="1" class="checkbox" <?= notification_sound_on() ? 'checked' : '' ?>>
                 <span class="text-sm text-ink">Play a sound for new notifications</span>
             </label>
             <div class="flex flex-col gap-3 sm:flex-row">
                 <button type="submit" class="btn-secondary">Save sound setting</button>
-                <button type="button" class="btn-ghost border border-line" data-test-sound="normal"><?= icon('bell') ?> Play normal chime</button>
-                <button type="button" class="btn-ghost border border-line" data-test-sound="urgent"><?= icon('alert-triangle') ?> Play urgent chime</button>
+                <button type="button" class="btn-ghost border border-line" data-test-sound="normal"><?= icon('volume') ?> Play normal sound</button>
+                <button type="button" class="btn-ghost border border-line" data-test-sound="urgent"><?= icon('alert-triangle') ?> Play urgent sound</button>
             </div>
-            <p class="hint">If you hear nothing, check that this browser tab is not muted and your device volume is up.</p>
+            <p class="hint">Browsers only allow sound after you have clicked or typed on the page. If a sound is held back, a <strong>Turn on sound</strong> button appears next to the bell. If you still hear nothing, check that the tab is not muted and the volume is up.</p>
         </form>
     </section>
 

@@ -421,68 +421,102 @@
   initCharts(document);
 
   /* =================================================== Notification sound */
-  // Generated with Web Audio (no files, no network). Soft sine chimes only:
-  // they must never resemble the rapid beeps of medical-device alarms.
-  const chime = (() => {
-    let ctx = null;
-    const context = () => {
-      const AC = window.AudioContext || window.webkitAudioContext;
-      if (!AC) return null;
-      ctx = ctx || new AC();
-      return ctx;
-    };
-    // Browsers only allow audio after the person has interacted with the page;
-    // unlock on the first click or key press so later chimes can play.
-    const unlock = () => { const c = context(); if (c && c.state === 'suspended') c.resume().catch(() => {}); };
-    ['pointerdown', 'keydown'].forEach((t) => document.addEventListener(t, unlock, { once: false, passive: true }));
+  // Plays the hospital's chosen sound (public/assets/audio/notification.mp3).
+  // Browsers only let a page play sound after the person has clicked, tapped
+  // or typed on THAT page, so: (1) the sound is primed on the first
+  // interaction with every page, and (2) if a sound is still blocked, it is
+  // kept and the "Turn on sound" button appears by the bell. Clicking it (or
+  // anywhere) plays the missed sound, so an alert is never silently lost.
+  const soundOn = $('meta[name="notify-sound"]')?.content === 'on';
+  const soundSrc = $('meta[name="notify-sound-src"]')?.content || '';
 
-    const note = (c, freq, start, length, peak) => {
-      const osc = c.createOscillator();
-      const gain = c.createGain();
-      osc.type = 'sine';
-      osc.frequency.value = freq;
-      gain.gain.setValueAtTime(0.0001, start);
-      gain.gain.exponentialRampToValueAtTime(peak, start + 0.02);       // soft attack
-      gain.gain.exponentialRampToValueAtTime(0.0001, start + length);  // gentle fade
-      osc.connect(gain).connect(c.destination);
-      osc.start(start);
-      osc.stop(start + length + 0.05);
-    };
-    return (kind = 'normal') => {
-      const c = context();
-      if (!c || c.state !== 'running') return false;
-      const t = c.currentTime + 0.02;
-      if (kind === 'urgent') {
-        // Brighter rising pair, played twice with a pause: noticeable, not alarming.
-        [0, 0.7].forEach((offset) => { note(c, 784, t + offset, 0.35, 0.22); note(c, 1175, t + offset + 0.16, 0.45, 0.22); });
-      } else {
-        note(c, 659, t, 0.4, 0.14);          // E5
-        note(c, 988, t + 0.14, 0.55, 0.12);  // B5
+  // One sound per new notification, even with several tabs open: the newest id
+  // that has already sounded is shared between tabs through localStorage.
+  const sharedLastChimed = {
+    get: () => { try { return parseInt(localStorage.getItem('ruma-last-chimed') || '0', 10); } catch { return 0; } },
+    set: (id) => { try { localStorage.setItem('ruma-last-chimed', String(id)); } catch { /* private mode: per-tab only */ } },
+  };
+
+  const sound = (() => {
+    let audio = null;
+    let unlocked = false;
+    let pending = null; // { id, kind, at }
+    const el = () => {
+      if (!audio && soundSrc) {
+        audio = new Audio(soundSrc);
+        audio.preload = 'auto';
       }
-      return true;
+      return audio;
+    };
+    const showBlocked = (blocked) => $$('[data-sound-blocked]').forEach((b) => { b.hidden = !blocked; });
+
+    const start = async (kind) => {
+      const a = el();
+      if (!a) return 'none';
+      // Urgent (Critical tickets, SLA warnings) plays twice at full volume.
+      let repeats = kind === 'urgent' ? 1 : 0;
+      a.onended = () => {
+        if (repeats-- > 0) { a.currentTime = 0; a.play().catch(() => {}); }
+      };
+      a.muted = false;
+      a.volume = kind === 'urgent' ? 1 : 0.8;
+      a.currentTime = 0;
+      try {
+        await a.play();
+        unlocked = true;
+        showBlocked(false);
+        return 'played';
+      } catch (err) {
+        return err && err.name === 'NotAllowedError' ? 'blocked' : 'error';
+      }
+    };
+
+    // Runs on every real interaction: plays a missed sound, or primes the
+    // audio so the next notification is allowed to play.
+    const unlock = () => {
+      if (pending && Date.now() - pending.at < 10 * 60 * 1000) {
+        const p = pending;
+        pending = null;
+        if (p.id === 0 || p.id > sharedLastChimed.get()) {
+          start(p.kind).then((r) => { if (r === 'played' && p.id) sharedLastChimed.set(p.id); });
+        }
+        return;
+      }
+      if (unlocked || !soundOn) return;
+      const a = el();
+      if (!a) return;
+      a.muted = true;
+      a.play().then(() => { a.pause(); a.currentTime = 0; a.muted = false; unlocked = true; showBlocked(false); })
+        .catch(() => { a.muted = false; });
+    };
+    ['pointerdown', 'keydown', 'touchstart'].forEach((t) => document.addEventListener(t, unlock, { passive: true }));
+
+    return {
+      /** @returns {Promise<'played'|'blocked'|'error'|'none'>} */
+      async play(kind, id = 0) {
+        const r = await start(kind);
+        if (r === 'blocked') {
+          pending = { id, kind, at: Date.now() };
+          showBlocked(true);
+        }
+        return r;
+      },
     };
   })();
 
   document.addEventListener('click', (e) => {
     const btn = e.target.closest('[data-test-sound]');
-    if (!btn) return;
-    // The click itself unlocks audio; wait a tick for the context to resume.
-    setTimeout(() => chime(btn.dataset.testSound), 60);
+    if (btn) sound.play(btn.dataset.testSound);
   });
 
-  // Chime once per new notification, even with several tabs open: the newest
-  // id that has already chimed is shared through localStorage.
-  const soundOn = $('meta[name="notify-sound"]')?.content === 'on';
   let lastSeenId = parseInt($('meta[name="last-notification"]')?.content || '0', 10);
-  const sharedLastChimed = {
-    get: () => { try { return parseInt(localStorage.getItem('ruma-last-chimed') || '0', 10); } catch { return 0; } },
-    set: (id) => { try { localStorage.setItem('ruma-last-chimed', String(id)); } catch { /* private mode: per-tab only */ } },
-  };
-  const maybeChime = (latest) => {
+  const maybeChime = async (latest) => {
     if (!latest || latest.id <= lastSeenId) return;
     lastSeenId = latest.id;
     if (!soundOn || latest.id <= sharedLastChimed.get()) return;
-    if (chime(latest.urgent ? 'urgent' : 'normal')) sharedLastChimed.set(latest.id);
+    sharedLastChimed.set(latest.id); // claim it first so other tabs stay quiet
+    const r = await sound.play(latest.urgent ? 'urgent' : 'normal', latest.id);
+    if (r === 'blocked') sharedLastChimed.set(latest.id - 1); // let an unlocked tab, or this one later, play it
   };
 
   /* ============================================= Live updates (polling) */

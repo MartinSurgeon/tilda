@@ -65,6 +65,9 @@
   h1, h2, h3, h4 { @apply text-ink; }
   a { @apply text-midnight underline-offset-2; }
   a:hover { @apply underline; }
+  /* Elements toggled with the hidden attribute must stay hidden even when a
+     component class (e.g. .btn) sets display. */
+  [hidden][class] { display: none !important; }
   /* Links inside running text are underlined, so they never rely on colour alone. */
   p a:not([class*="btn"]) { @apply underline; }
 

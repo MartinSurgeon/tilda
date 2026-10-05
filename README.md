@@ -115,12 +115,17 @@ Polling was chosen over Server-Sent Events because SSE keeps one PHP process bus
 tab, which shared hosting quickly runs out of. Polling pauses in background tabs and does
 not count as activity for the idle sign-out. A region the user is typing in is never replaced.
 
-**Notification sound:** a soft chime plays when a new notification arrives (a brighter chime, twice,
-for Critical tickets and SLA warnings). It is on by default for IT staff and off for everyone else;
-each person can change it, and test both chimes, under *My account → Sound*. Sounds are generated
-in the browser (no audio files) and are deliberately unlike medical-device alarms. With sound on,
-polling continues every 30 seconds in background tabs. Browsers only allow sound after the person
-has clicked or typed on the page at least once.
+**Notification sound:** plays `public/assets/audio/notification.mp3` when a new notification
+arrives (twice, louder, for Critical tickets and SLA warnings). On by default for IT staff, off for
+everyone else; each person can change it and test it under *My account → Sound*. To use a different
+sound, replace that file (keep it short and quiet enough for clinical areas).
+
+Browsers only allow a page to play sound after the person has clicked, tapped or typed on it. The
+system primes the sound on the first interaction with each page, and if a sound is still held back it
+shows a **Turn on sound** button by the bell, which plays the missed sound. For dependable sound on
+IT workstations, allow autoplay for the site once: in Edge or Chrome, *Settings → Site permissions →
+Media autoplay → Allow* for `it.ruma.hospital`, or centrally with the **AutoplayAllowlist** group
+policy (both browsers support it).
 
 ## Background jobs (cron)
 

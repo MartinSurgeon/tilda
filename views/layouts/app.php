@@ -13,6 +13,7 @@ $groups = nav_groups();
     <meta name="theme-color" content="#0d8257">
     <meta name="live-version" content="<?= e(App\Services\LiveVersion::for($me)) ?>">
     <meta name="notify-sound" content="<?= notification_sound_on() ? 'on' : 'off' ?>">
+    <meta name="notify-sound-src" content="<?= e(asset('audio/notification.mp3')) ?>">
     <meta name="last-notification" content="<?= (int) App\Core\DB::value('SELECT MAX(id) FROM notifications WHERE user_id = ?', [$me['id']]) ?>">
     <meta name="poll-interval" content="<?= (int) setting('poll.interval_seconds', '15') ?>">
     <title><?= e(($title ?? 'Dashboard') . ' · ' . config('name')) ?></title>
@@ -61,6 +62,9 @@ $groups = nav_groups();
                     </a>
                 <?php endif; ?>
 
+                <button type="button" class="btn-secondary min-h-touch px-3" data-sound-blocked hidden>
+                    <?= icon('volume-x') ?><span class="hidden sm:inline">Turn on sound</span><span class="sr-only sm:hidden">Turn on notification sound</span>
+                </button>
                 <a href="<?= e(url('/notifications')) ?>" class="btn-icon relative" data-bell
                    aria-label="Notifications<?= unread_notifications() ? ', ' . unread_notifications() . ' unread' : '' ?>">
                     <?= icon('bell', 'h-6 w-6') ?>
