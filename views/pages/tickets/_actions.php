@@ -72,7 +72,7 @@ $move = static function (string $to, array $x, bool $primary) use ($statusUrl, $
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-start">
                     <form method="post" action="<?= e(url('/tickets/' . $t['id'] . '/accept')) ?>">
                         <?= csrf_field() ?>
-                        <button type="submit" class="btn-primary w-full sm:w-auto" data-loading-text="Taking ticket…"><?= icon('user-check') ?> Take this ticket</button>
+                        <button type="submit" class="btn-primary w-full sm:w-auto" data-loading-text="Taking ticket…" data-kb-take><?= icon('user-check') ?> Take this ticket</button>
                     </form>
                 </div>
             <?php elseif ($primaryKey): ?>

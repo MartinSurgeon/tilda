@@ -127,9 +127,9 @@ $canWork = can('ticket.work');
                     <th scope="col">SLA</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody data-kb-list>
             <?php foreach ($tickets as $t): ?>
-                <tr>
+                <tr data-kb-item>
                     <td class="max-w-md">
                         <a href="<?= e(url('/tickets/' . $t['id'])) ?>" class="font-semibold text-ink"><?= e($t['title']) ?></a>
                         <p class="text-muted"><span class="font-mono"><?= e($t['ref']) ?></span> · <?= e($t['requester_name']) ?>, <?= e($t['department_name']) ?> · <?= e(fmt_relative($t['created_at'])) ?></p>
@@ -143,7 +143,7 @@ $canWork = can('ticket.work');
                             <form method="post" action="<?= e(url('/tickets/' . $t['id'] . '/accept')) ?>">
                                 <?= csrf_field() ?>
                                 <input type="hidden" name="return" value="<?= e($here) ?>">
-                                <button type="submit" class="btn-secondary" aria-label="Take <?= e($t['ref']) ?>" data-loading-text="Taking…"><?= icon('user-check', 'h-4 w-4') ?> Take</button>
+                                <button type="submit" class="btn-secondary" aria-label="Take <?= e($t['ref']) ?>" data-loading-text="Taking…" data-kb-take><?= icon('user-check', 'h-4 w-4') ?> Take</button>
                             </form>
                         <?php else: ?>
                             <span class="text-muted">Unassigned</span>
@@ -156,9 +156,9 @@ $canWork = can('ticket.work');
         </table>
     </div>
 
-    <ul class="space-y-3 lg:hidden" role="list">
+    <ul class="space-y-3 lg:hidden" role="list" data-kb-list>
         <?php foreach ($tickets as $t): ?>
-            <li><?= App\Core\View::partial('pages/tickets/_card', ['t' => $t, 'staff' => true, 'take' => $here]) ?></li>
+            <li data-kb-item><?= App\Core\View::partial('pages/tickets/_card', ['t' => $t, 'staff' => true, 'take' => $here]) ?></li>
         <?php endforeach; ?>
     </ul>
 

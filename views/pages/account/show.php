@@ -64,6 +64,18 @@
         </form>
     </section>
 
+    <section class="card" id="shortcuts" aria-labelledby="shortcuts-section-title">
+        <div class="card-header"><h2 id="shortcuts-section-title" class="card-title">Keyboard shortcuts</h2></div>
+        <div class="card-body space-y-4">
+            <p class="text-sm">Single-key shortcuts for moving through the queue and acting on tickets, for example <kbd class="kbd">j</kbd> and <kbd class="kbd">k</kbd> to move, <kbd class="kbd">t</kbd> to take. They never work while you are typing. This setting is saved in this browser.</p>
+            <label class="flex min-h-touch cursor-pointer items-center gap-3 rounded-lg px-2 hover:bg-smoke-2">
+                <input type="checkbox" class="checkbox" data-shortcuts-checkbox>
+                <span class="text-sm text-ink">Use keyboard shortcuts</span>
+            </label>
+            <button type="button" class="btn-secondary" data-open-dialog="shortcuts-help"><?= icon('key') ?> Show all shortcuts</button>
+        </div>
+    </section>
+
     <section class="card" id="sound" aria-labelledby="sound-title">
         <div class="card-header"><h2 id="sound-title" class="card-title">Sound</h2></div>
         <form method="post" action="<?= e(url('/account/sound')) ?>" class="card-body space-y-4">

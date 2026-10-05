@@ -311,6 +311,82 @@
   });
   enhancePhi(document);
 
+  /* ================================================ Keyboard shortcuts */
+  // On by default for IT staff, off for others; anyone can switch them in the
+  // help panel ("?") or My account (WCAG 2.1.4: single-key shortcuts must be
+  // switchable). Never active while typing or with Ctrl/Alt/Cmd held.
+  const SHORTCUT_KEY = 'ruma-shortcuts';
+  const shortcutsOn = () => {
+    let saved = null;
+    try { saved = localStorage.getItem(SHORTCUT_KEY); } catch { /* storage blocked */ }
+    return (saved || $('meta[name="shortcuts-default"]')?.content || 'off') === 'on';
+  };
+  const showShortcutState = (on) => {
+    $$('[data-shortcuts-state]').forEach((el) => { el.textContent = on ? 'on' : 'off'; });
+    $$('[data-shortcuts-toggle]').forEach((b) => { b.textContent = on ? 'Turn shortcuts off' : 'Turn shortcuts on'; });
+    $$('[data-shortcuts-checkbox]').forEach((c) => { c.checked = on; });
+  };
+  // Saved only when the person changes it, so the role default applies until then.
+  const setShortcuts = (on) => {
+    try { localStorage.setItem(SHORTCUT_KEY, on ? 'on' : 'off'); } catch { /* per page only */ }
+    showShortcutState(on);
+  };
+  showShortcutState(shortcutsOn());
+  document.addEventListener('click', (e) => { if (e.target.closest('[data-shortcuts-toggle]')) setShortcuts(!shortcutsOn()); });
+  document.addEventListener('change', (e) => { if (e.target.matches('[data-shortcuts-checkbox]')) setShortcuts(e.target.checked); });
+
+  const listItems = () => $$('[data-kb-list] > [data-kb-item]').filter((li) => li.offsetParent !== null);
+  const currentItem = () => document.activeElement?.closest('[data-kb-item]') || $('.kb-selected');
+  const select = (item) => {
+    $$('.kb-selected').forEach((el) => el.classList.remove('kb-selected'));
+    if (!item) return;
+    item.classList.add('kb-selected');
+    const link = $('a[href]', item);
+    (link || item).focus();
+    item.scrollIntoView({ block: 'nearest' });
+  };
+  const go = (path) => { window.location.href = `${window.RUMA.base()}${path}`; };
+  const typing = (el) => el && (el.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName));
+  let pendingG = 0;
+
+  document.addEventListener('keydown', (e) => {
+    if (!shortcutsOn() || e.ctrlKey || e.metaKey || e.altKey || typing(e.target)) return;
+    if ($('dialog[open]') && e.key !== '?') return; // a dialog is in charge of the keyboard
+    const k = e.key;
+    if (pendingG && Date.now() - pendingG < 1500) {
+      pendingG = 0;
+      const dest = { d: '/', q: '/tickets', m: '/tickets/mine', n: '/notifications' }[k];
+      if (dest) { e.preventDefault(); go(dest); }
+      return;
+    }
+    switch (k) {
+      case '?': { e.preventDefault(); const d = $('#shortcuts-help'); if (d && !d.open) d.showModal(); return; }
+      case 'g': pendingG = Date.now(); return;
+      case 'n': if (canReport()) { e.preventDefault(); go('/tickets/create'); } return;
+      case '/': { const s = $('main input[type="search"]'); if (s) { e.preventDefault(); s.focus(); s.select(); } return; }
+      case 'j':
+      case 'k': {
+        const items = listItems();
+        if (!items.length) return;
+        e.preventDefault();
+        const i = items.indexOf(currentItem());
+        const next = k === 'j' ? Math.min(items.length - 1, i + 1) : Math.max(0, i < 0 ? 0 : i - 1);
+        select(items[next]);
+        return;
+      }
+      case 't': {
+        const scope = currentItem() || ($('[data-kb-list]') ? null : document);
+        const btn = scope && $('[data-kb-take]', scope);
+        if (btn) { e.preventDefault(); btn.click(); }
+        return;
+      }
+      case 'r': { const reply = $('#body'); if (reply) { e.preventDefault(); reply.focus(); reply.scrollIntoView({ block: 'center' }); } return; }
+      default:
+    }
+  });
+  // "New ticket" link is only present for people allowed to report problems.
+  function canReport() { return !!$('a[href$="/tickets/create"]'); } // the New ticket link only exists for people allowed to report
+
   /* ---------------------------- Day / night switch for "match device" */
   // The server knows the person's choice; only the browser knows whether the
   // device is currently dark, so the quick switch offers the opposite of what

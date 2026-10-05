@@ -51,9 +51,9 @@ foreach ($notifications as $n) {
         <?php foreach ($groups as $label => $items): ?>
             <section aria-label="<?= e($label) ?>">
                 <h2 class="section-title mb-2"><?= e($label) ?></h2>
-                <ul class="card divide-y divide-line overflow-hidden" role="list">
+                <ul class="card divide-y divide-line overflow-hidden" role="list" data-kb-list>
                     <?php foreach ($items as $n): [$ico, $tone] = $icons[$n['event']] ?? ['bell', 'bg-smoke text-muted']; $isUnread = $n['read_at'] === null; ?>
-                        <li>
+                        <li data-kb-item>
                             <a href="<?= e(url('/notifications/' . $n['id'])) ?>" class="flex min-h-touch items-start gap-3 px-4 py-3 text-charcoal no-underline hover:bg-smoke-2 hover:no-underline sm:px-6 <?= $isUnread ? 'bg-teal-tint/40' : '' ?>">
                                 <span class="stat-icon h-9 w-9 <?= $tone ?>"><?= icon($ico, 'h-4 w-4') ?></span>
                                 <div class="min-w-0 flex-1">

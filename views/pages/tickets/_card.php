@@ -29,7 +29,7 @@ $canTake = !empty($take) && $t['assignee_id'] === null && in_array($t['status'],
         <form method="post" action="<?= e(url('/tickets/' . $t['id'] . '/accept')) ?>" class="border-t border-line bg-smoke-2 px-4 py-2">
             <?= csrf_field() ?>
             <input type="hidden" name="return" value="<?= e($take) ?>">
-            <button type="submit" class="btn-primary w-full" data-loading-text="Taking…"><?= icon('user-check') ?> Take <?= e($t['ref']) ?></button>
+            <button type="submit" class="btn-primary w-full" data-loading-text="Taking…" data-kb-take><?= icon('user-check') ?> Take <?= e($t['ref']) ?></button>
         </form>
     <?php endif; ?>
 </div>

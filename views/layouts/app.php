@@ -15,6 +15,7 @@ $groups = nav_groups();
     <meta name="notify-sound" content="<?= notification_sound_on() ? 'on' : 'off' ?>">
     <meta name="notify-sound-src" content="<?= e(asset('audio/notification.mp3')) ?>">
     <meta name="last-notification" content="<?= (int) App\Core\DB::value('SELECT MAX(id) FROM notifications WHERE user_id = ?', [$me['id']]) ?>">
+    <meta name="shortcuts-default" content="<?= can('ticket.work') ? 'on' : 'off' ?>">
     <meta name="poll-interval" content="<?= (int) setting('poll.interval_seconds', '15') ?>">
     <title><?= e(($title ?? 'Dashboard') . ' · ' . config('name')) ?></title>
     <link rel="icon" href="<?= e(url('favicon.svg')) ?>" type="image/svg+xml">
@@ -89,6 +90,7 @@ $groups = nav_groups();
                         </p>
                         <a href="<?= e(url('/account')) ?>" class="nav-link"><?= icon('user') ?> My account</a>
                         <?= App\Core\View::partial('partials/theme-toggle') ?>
+                        <button type="button" class="nav-link w-full" data-open-dialog="shortcuts-help"><?= icon('key') ?> Keyboard shortcuts</button>
                         <form method="post" action="<?= e(url('/logout')) ?>">
                             <?= csrf_field() ?>
                             <button type="submit" class="nav-link w-full"><?= icon('logout') ?> Sign out</button>
@@ -106,5 +108,6 @@ $groups = nav_groups();
 </div>
 
 <?= App\Core\View::partial('partials/bottom-nav', ['groups' => $groups]) ?>
+<?= App\Core\View::partial('partials/shortcuts-help') ?>
 </body>
 </html>

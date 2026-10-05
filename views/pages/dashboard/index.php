@@ -83,9 +83,9 @@ $has = static fn (string $s) => in_array($s, $sections, true);
                 <?= View::partial('components/empty-state', ['icon' => 'check-circle', 'title' => 'All clear', 'level' => 3,
                     'text' => 'Nothing is waiting for you or unassigned right now.']) ?>
             <?php else: ?>
-                <ul class="divide-y divide-line" role="list">
+                <ul class="divide-y divide-line" role="list" data-kb-list>
                     <?php foreach ($attention as $t): ?>
-                        <li>
+                        <li data-kb-item>
                             <a href="<?= e(url('/tickets/' . $t['id'])) ?>" class="flex min-h-touch flex-col gap-2 px-4 py-3 text-charcoal no-underline hover:bg-smoke-2 hover:no-underline sm:flex-row sm:items-center sm:px-6">
                                 <div class="min-w-0 flex-1">
                                     <p class="truncate font-semibold text-ink"><?= e($t['title']) ?></p>
@@ -187,9 +187,9 @@ $has = static fn (string $s) => in_array($s, $sections, true);
                     ]) ?>
                 </div>
             <?php else: ?>
-                <ul class="divide-y divide-line" role="list">
+                <ul class="divide-y divide-line" role="list" data-kb-list>
                     <?php foreach ($myTickets as $t): ?>
-                        <li>
+                        <li data-kb-item>
                             <a href="<?= e(url('/tickets/' . $t['id'])) ?>" class="flex min-h-touch items-center gap-3 px-4 py-3 text-charcoal no-underline hover:bg-smoke-2 hover:no-underline sm:px-6">
                                 <div class="min-w-0 flex-1">
                                     <p class="truncate font-semibold text-ink"><?= e($t['title']) ?></p>
