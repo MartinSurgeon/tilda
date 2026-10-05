@@ -9,8 +9,8 @@
                         <a href="<?= e(url($item['path'])) ?>" class="nav-link" <?= nav_is_active($item['path']) ? 'aria-current="page"' : '' ?>>
                             <?= icon($item['icon']) ?>
                             <span class="flex-1"><?= e($item['label']) ?></span>
-                            <?php if ($item['path'] === '/notifications' && unread_notifications() > 0): ?>
-                                <span class="badge-danger" data-bell-count-nav><?= unread_notifications() ?><span class="sr-only"> unread</span></span>
+                            <?php if ($item['path'] === '/notifications'): /* kept in sync live by app.js */ ?>
+                                <span class="badge-danger" <?= unread_notifications() ? '' : 'hidden' ?>><span data-bell-count-nav><?= unread_notifications() ?></span><span class="sr-only"> unread</span></span>
                             <?php endif; ?>
                         </a>
                     </li>

@@ -53,7 +53,24 @@
                 <button type="button" class="btn-ghost border border-line" data-test-sound="normal"><?= icon('volume') ?> Play normal sound</button>
                 <button type="button" class="btn-ghost border border-line" data-test-sound="urgent"><?= icon('alert-triangle') ?> Play urgent sound</button>
             </div>
-            <p class="hint">Browsers only allow sound after you have clicked or typed on the page. If a sound is held back, a <strong>Turn on sound</strong> button appears next to the bell. If you still hear nothing, check that the tab is not muted and the volume is up.</p>
+            <?php $site = (App\Core\Request::isHttps() ? 'https' : 'http') . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost'); ?>
+            <details class="rounded-lg border border-line bg-smoke-2 p-4" open>
+                <summary class="flex min-h-touch cursor-pointer items-center font-semibold text-ink">Make it ring automatically, without clicking</summary>
+                <div class="mt-2 space-y-3 text-sm">
+                    <p>Web browsers block sound on a page until you click or type on it. This rule belongs to the browser, so the system cannot switch it off. Until you change it, a <strong>Turn on sound</strong> button appears next to the bell, and one click turns sound on for that page.</p>
+                    <p>To have sound play as soon as a ticket arrives, allow it once on this computer:</p>
+                    <ol class="list-decimal space-y-1 pl-5">
+                        <li><strong>Microsoft Edge:</strong> open <code class="font-mono">edge://settings/content/mediaAutoplay</code>, then under <em>Allow</em> choose <em>Add</em> and paste the address below.</li>
+                        <li><strong>Google Chrome:</strong> Chrome has no per-site switch for this. Ask IT to add the address to the <em>AutoplayAllowlist</em> policy.</li>
+                        <li>Reload this page. The <strong>Turn on sound</strong> button should no longer appear.</li>
+                    </ol>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <code id="site-address" class="rounded-md bg-white px-3 py-2 font-mono text-ink"><?= e($site) ?></code>
+                        <button type="button" class="btn-secondary" data-copy="site-address">Copy address</button>
+                    </div>
+                    <p class="text-muted">If you still hear nothing, check that the browser tab is not muted and the volume is up.</p>
+                </div>
+            </details>
         </form>
     </section>
 

@@ -62,7 +62,8 @@ $groups = nav_groups();
                     </a>
                 <?php endif; ?>
 
-                <button type="button" class="btn-secondary min-h-touch px-3" data-sound-blocked hidden>
+                <button type="button" class="btn-secondary min-h-touch px-3" data-sound-blocked hidden
+                        title="Your browser holds sound back until you click on the page. Click once to turn it on. To never need this, allow sound for this site: see My account, Sound.">
                     <?= icon('volume-x') ?><span class="hidden sm:inline">Turn on sound</span><span class="sr-only sm:hidden">Turn on notification sound</span>
                 </button>
                 <a href="<?= e(url('/notifications')) ?>" class="btn-icon relative" data-bell

@@ -492,6 +492,21 @@
     ['pointerdown', 'keydown', 'touchstart'].forEach((t) => document.addEventListener(t, unlock, { passive: true }));
 
     return {
+      /**
+       * Ask the browser now, silently, whether this page may play sound.
+       * Volume 0 still counts as "audible" to the autoplay rules, so a refusal
+       * here means a real notification would be blocked too: show the button
+       * straight away instead of after an alert has been missed.
+       */
+      check() {
+        const a = el();
+        if (!a || unlocked) return;
+        a.muted = false;
+        a.volume = 0;
+        a.play()
+          .then(() => { a.pause(); a.currentTime = 0; unlocked = true; showBlocked(false); })
+          .catch((err) => { if (err && err.name === 'NotAllowedError') showBlocked(true); });
+      },
       /** @returns {Promise<'played'|'blocked'|'error'|'none'>} */
       async play(kind, id = 0) {
         const r = await start(kind);
@@ -503,6 +518,8 @@
       },
     };
   })();
+
+  if (soundOn) sound.check();
 
   document.addEventListener('click', (e) => {
     const btn = e.target.closest('[data-test-sound]');
@@ -534,13 +551,26 @@
     document.body.appendChild(announcer);
   }
 
+  // Every unread counter on the page moves together: top-bar bell, mobile
+  // "Alerts", sidebar and menu badges, the Notifications heading, and the
+  // browser tab title, e.g. "(7) Dashboard", so a background tab shows it too.
+  const baseTitle = document.title.replace(/^\(\d+\+?\)\s*/, '');
   const setBell = (count) => {
+    const text = count > 99 ? '99+' : String(count);
     $$('[data-bell-count]').forEach((el) => {
-      el.textContent = count > 99 ? '99+' : String(count);
+      el.textContent = text;
       el.classList.toggle('hidden', count === 0);
     });
+    $$('[data-bell-count-nav]').forEach((el) => {
+      el.textContent = text;
+      el.parentElement.hidden = count === 0;
+    });
+    $$('[data-unread-text]').forEach((el) => { el.textContent = count ? `${count} unread` : 'You are all caught up'; });
+    $$('[data-unread-action]').forEach((el) => { el.hidden = count === 0; });
     $('[data-bell]')?.setAttribute('aria-label', count ? `Notifications, ${count} unread` : 'Notifications');
+    document.title = count ? `(${text}) ${baseTitle}` : baseTitle;
   };
+  setBell(parseInt($('[data-bell-count]')?.textContent || '0', 10) || 0);
 
   // Never pull the rug from under someone: skip a region while they are using it.
   const isBusy = (region) => {

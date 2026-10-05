@@ -121,8 +121,9 @@ everyone else; each person can change it and test it under *My account → Sound
 sound, replace that file (keep it short and quiet enough for clinical areas).
 
 Browsers only allow a page to play sound after the person has clicked, tapped or typed on it. The
-system primes the sound on the first interaction with each page, and if a sound is still held back it
-shows a **Turn on sound** button by the bell, which plays the missed sound. For dependable sound on
+system checks this silently as soon as a page opens: if sound is blocked, a **Turn on sound** button appears
+by the bell straight away (before any alert is missed), and clicking it, or anywhere on the page, turns
+sound on and plays any alert that was held back. *My account → Sound* shows staff the exact steps. For dependable sound on
 IT workstations, allow autoplay for the site once: in Edge or Chrome, *Settings → Site permissions →
 Media autoplay → Allow* for `it.ruma.hospital`, or centrally with the **AutoplayAllowlist** group
 policy (both browsers support it).

@@ -19,14 +19,13 @@ foreach ($notifications as $n) {
 <header class="mb-5 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
     <div>
         <h1 class="page-title">Notifications</h1>
-        <p class="page-subtitle"><?= $unread ? $unread . ' unread' : 'You are all caught up' ?></p>
+        <p class="page-subtitle" data-unread-text><?= $unread ? $unread . ' unread' : 'You are all caught up' ?></p>
     </div>
-    <?php if ($unread): ?>
-        <form method="post" action="<?= e(url('/notifications/read-all')) ?>">
-            <?= csrf_field() ?>
-            <button type="submit" class="btn-secondary w-full sm:w-auto"><?= icon('check') ?> Mark all as read</button>
-        </form>
-    <?php endif; ?>
+    <!-- Always rendered; shown or hidden live as the unread count changes. -->
+    <form method="post" action="<?= e(url('/notifications/read-all')) ?>" data-unread-action <?= $unread ? '' : 'hidden' ?>>
+        <?= csrf_field() ?>
+        <button type="submit" class="btn-secondary w-full sm:w-auto"><?= icon('check') ?> Mark all as read</button>
+    </form>
 </header>
 
 <nav class="mb-4" aria-label="Filter notifications">
