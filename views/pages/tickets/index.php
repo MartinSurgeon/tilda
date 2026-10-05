@@ -8,6 +8,10 @@ use App\Services\TicketMeta;
 
 $activeFilters = count(array_filter([$filters['status'], $filters['priority'], $filters['category'], $filters['department'], $filters['assignee']]));
 $keep = ['view' => $view] + array_filter($filters, static fn ($v) => $v !== '' && $v !== 0);
+// Where a quick "Take" returns to: this exact queue view, filters and page.
+$hereQuery = array_filter($keep + ['page' => $page > 1 ? $page : null], static fn ($v) => $v !== null && $v !== '');
+$here = '/tickets' . ($hereQuery ? '?' . http_build_query($hereQuery) : ''); // app-relative; Response::redirect adds the base path
+$canWork = can('ticket.work');
 ?>
 <header class="mb-5 flex flex-col gap-1">
     <h1 class="page-title">Ticket queue</h1>
@@ -132,7 +136,19 @@ $keep = ['view' => $view] + array_filter($filters, static fn ($v) => $v !== '' &
                     </td>
                     <td><?= TicketMeta::priorityBadge($t['priority_name'], $t['tone'], $t['priority_icon']) ?></td>
                     <td><?= TicketMeta::statusBadge($t['status']) ?></td>
-                    <td><?= $t['assignee_name'] ? e($t['assignee_name']) : '<span class="text-muted">Unassigned</span>' ?></td>
+                    <td>
+                        <?php if ($t['assignee_name']): ?>
+                            <?= e($t['assignee_name']) ?>
+                        <?php elseif ($canWork && in_array($t['status'], ['open', 'reopened'], true)): ?>
+                            <form method="post" action="<?= e(url('/tickets/' . $t['id'] . '/accept')) ?>">
+                                <?= csrf_field() ?>
+                                <input type="hidden" name="return" value="<?= e($here) ?>">
+                                <button type="submit" class="btn-secondary" aria-label="Take <?= e($t['ref']) ?>" data-loading-text="Taking…"><?= icon('user-check', 'h-4 w-4') ?> Take</button>
+                            </form>
+                        <?php else: ?>
+                            <span class="text-muted">Unassigned</span>
+                        <?php endif; ?>
+                    </td>
                     <td><?= TicketMeta::slaBadge($t) ?></td>
                 </tr>
             <?php endforeach; ?>
@@ -142,7 +158,7 @@ $keep = ['view' => $view] + array_filter($filters, static fn ($v) => $v !== '' &
 
     <ul class="space-y-3 lg:hidden" role="list">
         <?php foreach ($tickets as $t): ?>
-            <li><?= App\Core\View::partial('pages/tickets/_card', ['t' => $t, 'staff' => true]) ?></li>
+            <li><?= App\Core\View::partial('pages/tickets/_card', ['t' => $t, 'staff' => true, 'take' => $here]) ?></li>
         <?php endforeach; ?>
     </ul>
 

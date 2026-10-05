@@ -24,7 +24,10 @@ final class TicketActionController
         if (!TicketPolicy::canAccept($t, $user)) {
             Gate::deny('ticket.accept');
         }
-        $this->attempt($id, fn () => TicketService::assign($t, (int) $user['id'], $user), 'You have taken this ticket.');
+        // From the queue, stay on the queue so the next ticket can be triaged straight away.
+        $return = safe_path(Request::input('return', ''), '');
+        $this->attempt($id, fn () => TicketService::assign($t, (int) $user['id'], $user),
+            $return !== '' ? "You have taken {$t['ref']}." : 'You have taken this ticket.', '', $return);
     }
 
     public function assign(int $id): void
@@ -139,7 +142,7 @@ final class TicketActionController
         return [$t, $user];
     }
 
-    private function attempt(int $id, callable $action, string $success, string $anchor = ''): never
+    private function attempt(int $id, callable $action, string $success, string $anchor = '', string $to = ''): never
     {
         try {
             $action();
@@ -150,7 +153,7 @@ final class TicketActionController
             throw $e;
         }
         Session::flash('success', $success);
-        Response::redirect("/tickets/{$id}{$anchor}");
+        Response::redirect($to !== '' ? $to : "/tickets/{$id}{$anchor}");
     }
 
     private function fail(int $id, string $message): never

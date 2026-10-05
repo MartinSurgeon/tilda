@@ -8,7 +8,7 @@ use App\Services\Uploads;
         <?= csrf_field() ?>
         <div>
             <label for="body" class="label">Message</label>
-            <textarea class="textarea" <?= field_attrs('body', true) ?> rows="4" maxlength="5000" required
+            <textarea class="textarea" data-phi-check <?= field_attrs('body', true) ?> rows="4" maxlength="5000" required
                       data-msg-required="Please write a message before sending."><?= e(old('body')) ?></textarea>
             <p id="body-hint" class="hint"><?= $canInternal
                 ? 'Replies are seen by the requester. Never include patient information.'

@@ -200,6 +200,41 @@
   .meter-low      { --meter-color: rgb(var(--rgb-line-strong)); }
 }
 
+/* ---- Progressive disclosure that slides instead of jumping ---- */
+@layer components {
+  .reveal { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows 0.25s ease, opacity 0.2s ease; }
+  .reveal.is-open { grid-template-rows: 1fr; opacity: 1; }
+  .reveal-inner { min-height: 0; overflow: hidden; }
+  /* Once open, stop clipping so focus rings around the select are not cut off. */
+  .reveal.is-settled .reveal-inner { overflow: visible; }
+  .chart-hit { touch-action: pan-y; } /* vertical page scroll still works over the chart */
+
+  /* Form action bar that stays reachable above the mobile bottom navigation. */
+  .sticky-actions {
+    @apply sticky z-20 -mx-4 flex items-center gap-3 border-t border-line bg-white px-4 py-3 shadow-raised
+           sm:-mx-6 sm:px-6 lg:static lg:mx-0 lg:justify-end lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none;
+    bottom: var(--bottom-nav-height, 4rem);
+  }
+}
+
+/* ---- Live update indicator (top bar) ---- */
+@layer components {
+  .live-indicator { @apply inline-flex min-h-touch items-center gap-2 rounded-full px-2 text-xs font-semibold text-neutral-text; }
+  .live-dot { @apply relative inline-block h-2.5 w-2.5 rounded-full bg-green; }
+  .live-label { @apply hidden md:inline; }
+  .live-indicator[data-state="offline"] .live-dot,
+  .live-indicator[data-state="stopped"] .live-dot { @apply bg-line-strong; }
+  /* Offline is worth seeing on phones too. */
+  .live-indicator[data-state="offline"] .live-label,
+  .live-indicator[data-state="stopped"] .live-label { @apply inline text-warning-text; }
+  .live-indicator.is-pulsing .live-dot::after {
+    content: ""; position: absolute; inset: 0; border-radius: 9999px;
+    background: rgb(var(--rgb-green)); animation: live-ping 0.9s ease-out 1;
+  }
+  @keyframes live-ping { from { transform: scale(1); opacity: 0.6; } to { transform: scale(2.6); opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) { .live-indicator.is-pulsing .live-dot::after { display: none; } }
+}
+
 @layer utilities {
   .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
 }

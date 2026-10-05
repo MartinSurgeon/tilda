@@ -54,6 +54,11 @@ $groups = nav_groups();
                 <span class="text-base font-bold text-ink">RUMA IT</span>
             </a>
             <p class="hidden truncate text-base font-semibold text-ink lg:block"><?= e($title ?? '') ?></p>
+            <!-- Live update status: pulses on each successful update, turns grey when updates fail. -->
+            <span class="live-indicator" data-live-indicator data-state="live" role="status" title="Updates automatically">
+                <span class="live-dot" aria-hidden="true"></span>
+                <span class="live-label" data-live-label>Live</span>
+            </span>
 
             <div class="ml-auto flex items-center gap-1 sm:gap-2">
                 <?php if (can('ticket.create')): ?>

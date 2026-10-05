@@ -265,6 +265,59 @@
     }, 0);
   });
 
+  /* ------------------------------------ Patient-data warning while typing */
+  // Tickets must never contain patient information. This only WARNS (never
+  // blocks) and never sends or stores what was typed. Recent dates are not
+  // flagged, because "since 03/10/2026" is a normal thing to write.
+  const PHI_CHECKS = (() => {
+    const oldestNormalYear = new Date().getFullYear() - 1;
+    return [
+      [/\b(MRN|medical\s+record\s+(no|number)|hospital\s+(no|number)|folder\s+(no|number)|patient\s+(id|no|number|name))\b/i, 'a patient or record number'],
+      [/\b(DOB|D\.O\.B|date\s+of\s+birth|born\s+on)\b/i, 'a date of birth'],
+      [/\b(NHIS|insurance\s+(no|number)|national\s+id)\b/i, 'an insurance or ID number'],
+      [{ test: (s) => [...s.matchAll(/\b\d{1,2}[/.-]\d{1,2}[/.-]((?:19|20)\d{2})\b/g)].some((m) => +m[1] < oldestNormalYear) }, 'a date that may be a date of birth'],
+      [/\b\d{8,}\b/, 'a long number that may be a patient ID'],
+      [/\b(Mr|Mrs|Ms|Miss|Master)\.?\s+[A-Z][a-z]{2,}/, 'what looks like a person’s name'],
+    ];
+  })();
+  const phiFound = (text) => {
+    const found = PHI_CHECKS.filter(([re]) => re.test(text)).map(([, label]) => label);
+    return found.includes('a date of birth') ? found.filter((l) => l !== 'a date that may be a date of birth') : found;
+  };
+
+  const phiCheck = (field) => {
+    const id = `${field.id}-phi`;
+    let box = document.getElementById(id);
+    const found = phiFound(field.value);
+    if (!found.length) {
+      if (box) box.hidden = true;
+      return;
+    }
+    if (!box) {
+      box = document.createElement('p');
+      box.id = id;
+      box.className = 'alert-warning mt-2';
+      box.setAttribute('aria-live', 'polite');
+      field.insertAdjacentElement('afterend', box);
+      field.setAttribute('aria-describedby', [field.getAttribute('aria-describedby'), id].filter(Boolean).join(' '));
+    }
+    box.hidden = false;
+    box.textContent = `This may contain patient information (${found.join(', ')}). Please remove it and describe the equipment or system instead. If it is not about a patient, you can ignore this.`;
+  };
+  const enhancePhi = (root) => $$('[data-phi-check]', root).forEach((field) => {
+    let t;
+    field.addEventListener('input', () => { clearTimeout(t); t = setTimeout(() => phiCheck(field), 400); });
+    if (field.value) phiCheck(field);
+  });
+  enhancePhi(document);
+
+  /* ------------- Sticky form actions sit exactly on the bottom navigation */
+  const bottomNav = $('[data-bottom-nav]');
+  const syncBottomNav = () => document.documentElement.style.setProperty(
+    '--bottom-nav-height', `${bottomNav && getComputedStyle(bottomNav).display !== 'none' ? bottomNav.offsetHeight : 0}px`); // fixed elements have no offsetParent
+  syncBottomNav();
+  window.addEventListener('resize', syncBottomNav);
+
   /* ------------------------------- Sub-category follows chosen category */
   const sub = $('[data-subcategory]');
   if (sub) {
@@ -278,7 +331,15 @@
       sub.replaceChildren(blank.cloneNode(true), ...(group ? group.options.map((o) => o.cloneNode(true)) : []));
       sub.value = group && group.options.some((o) => o.value === keep) ? keep : '';
       // Progressive disclosure: only ask once a category with sub-types is chosen.
-      wrap.hidden = !group;
+      // Slides open instead of jumping (instant when reduced motion is on);
+      // while closed it is inert, so keyboard and screen readers skip it.
+      const open = !!group;
+      wrap.classList.add('reveal');
+      wrap.classList.toggle('is-open', open);
+      wrap.inert = !open;
+      clearTimeout(wrap.settleTimer);
+      wrap.classList.remove('is-settled');
+      if (open) wrap.settleTimer = setTimeout(() => wrap.classList.add('is-settled'), 260);
     };
     $$('input[name="category_id"]').forEach((r) => r.addEventListener('change', render));
     render();
@@ -354,7 +415,7 @@
     const cross = svgEl('g', { visibility: 'hidden' }, svg);
     svgEl('line', { class: 'chart-crosshair', y1: m.t, y2: m.t + ih, x1: 0, x2: 0 }, cross);
     const hoverDots = data.series.map((s) => svgEl('circle', { class: `chart-dot series-${s.key}`, r: 4, cx: 0, cy: 0 }, cross));
-    const hit = svgEl('rect', { x: m.l - 8, y: 0, width: iw + 16, height: H, fill: 'transparent' }, svg);
+    const hit = svgEl('rect', { class: 'chart-hit', x: m.l - 8, y: 0, width: iw + 16, height: H, fill: 'transparent' }, svg);
     box.prepend(svg);
 
     let tip = $('.chart-tooltip', box);
@@ -400,8 +461,16 @@
       const px = clientX - svg.getBoundingClientRect().left;
       return Math.max(0, Math.min(n - 1, Math.round(((px - m.l) / iw) * (n - 1))));
     };
+    // Mouse: follow the pointer. Touch/pen: a tap shows that day, dragging
+    // scrubs, and the readout stays until the person taps elsewhere.
     hit.addEventListener('pointermove', (e) => show(nearest(e.clientX)));
-    hit.addEventListener('pointerleave', hide);
+    hit.addEventListener('pointerdown', (e) => show(nearest(e.clientX)));
+    hit.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') hide(); });
+    if (!box.dataset.outsideTapBound) {
+      box.dataset.outsideTapBound = '1';
+      document.addEventListener('pointerdown', (e) => { if (!box.contains(e.target) && box.chartHide) box.chartHide(); });
+    }
+    box.chartHide = hide; // latest drawing's hide (the chart redraws on resize)
     box.onkeydown = (e) => {
       const cur = box.dataset.index === undefined ? n : parseInt(box.dataset.index, 10);
       if (e.key === 'ArrowLeft') { e.preventDefault(); show(Math.max(0, Math.min(cur, n) - 1)); }
@@ -612,6 +681,33 @@
 
   let timer = null;
   let lastPollAt = 0;
+
+  // Visible system status: "Live" (brief pulse on every successful update),
+  // "Offline, retrying" after two failures in a row, "Not updating" once signed out.
+  let failures = 0;
+  const setLive = (state) => {
+    const box = $('[data-live-indicator]');
+    if (!box) return;
+    const label = $('[data-live-label]', box);
+    if (state === 'live') {
+      failures = 0;
+      box.dataset.state = 'live';
+      label.textContent = 'Live';
+      box.title = `Updated at ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
+      box.classList.remove('is-pulsing');
+      void box.offsetWidth; // restart the animation
+      box.classList.add('is-pulsing');
+    } else if (state === 'offline') {
+      if (++failures < 2) return; // one blip is not worth alarming anyone
+      box.dataset.state = 'offline';
+      label.textContent = 'Offline, retrying';
+      box.title = 'Cannot reach the server. Updates will resume automatically.';
+    } else {
+      box.dataset.state = 'stopped';
+      label.textContent = 'Not updating';
+      box.title = 'Signed out. Reload the page to sign in again.';
+    }
+  };
   const poll = async () => {
     if (!version) return;
     // Hidden tabs: only keep listening if the chime is on, and then less often.
@@ -624,9 +720,10 @@
         headers: { 'X-Background': '1', Accept: 'application/json' },
         credentials: 'same-origin',
       });
-      if (res.status === 401 || res.status === 403) { clearInterval(timer); return; } // signed out: stop quietly
-      if (!res.ok) return;
+      if (res.status === 401 || res.status === 403) { clearInterval(timer); setLive('stopped'); return; } // signed out
+      if (!res.ok) { setLive('offline'); return; }
       const data = await res.json();
+      setLive('live');
       setBell(data.unread);
       maybeChime(data.latest);
       if (data.version !== version && !document.hidden) { // refresh content when someone can see it
@@ -636,7 +733,7 @@
           announcer.textContent = `Updated at ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
         }
       }
-    } catch { /* offline or server busy: try again next tick */ }
+    } catch { setLive('offline'); /* network down or server busy: try again next tick */ }
   };
   if (version) {
     timer = setInterval(poll, intervalMs);

@@ -33,13 +33,16 @@ $selectedCategory = (string) old('category_id');
         <section class="card card-body space-y-5" aria-labelledby="what-title">
             <h2 id="what-title" class="card-title">What is the problem?</h2>
 
+            <!-- Category and its sub-type form one step; the sub-type list slides open once a category is picked. -->
+            <div>
             <fieldset <?= error('category_id') ? 'aria-describedby="category_id-error"' : '' ?>>
                 <legend class="label">It is about…</legend>
                 <div class="grid grid-cols-2 gap-2 sm:grid-cols-5" data-category-tiles>
                     <?php foreach ($categories as $c): ?>
-                        <label class="relative flex min-h-[4.5rem] cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border border-line-strong bg-white p-2 text-center text-sm font-semibold text-ink hover:bg-smoke-2 has-[:checked]:border-teal has-[:checked]:bg-teal-tint has-[:checked]:text-teal-darker has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-midnight">
+                        <label class="group relative flex min-h-[4.5rem] cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border border-line-strong bg-white p-2 text-center text-sm font-semibold text-ink hover:bg-smoke-2 has-[:checked]:border-teal has-[:checked]:bg-teal-tint has-[:checked]:text-teal-darker has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-midnight">
                             <input type="radio" name="category_id" value="<?= (int) $c['id'] ?>" class="sr-only" required
                                    <?= $selectedCategory === (string) $c['id'] ? 'checked' : '' ?>>
+                            <span class="absolute right-1.5 top-1.5 hidden h-5 w-5 items-center justify-center rounded-full bg-teal text-white group-has-[:checked]:flex" aria-hidden="true"><?= icon('check', 'h-3.5 w-3.5') ?></span>
                             <?= icon($c['icon'], 'h-6 w-6') ?>
                             <span><?= e($c['name']) ?></span>
                         </label>
@@ -48,7 +51,7 @@ $selectedCategory = (string) old('category_id');
                 <?= field_error('category_id') ?>
             </fieldset>
 
-            <div data-subcategory-wrap>
+            <div data-subcategory-wrap><div class="reveal-inner"><div class="pt-5">
                 <label for="subcategory_id" class="label">Type of problem <span class="label-optional">(optional)</span></label>
                 <select class="select" <?= field_attrs('subcategory_id') ?> data-subcategory>
                     <option value="">Not sure / other</option>
@@ -61,11 +64,12 @@ $selectedCategory = (string) old('category_id');
                     <?php endforeach; ?>
                 </select>
                 <?= field_error('subcategory_id') ?>
+            </div></div></div>
             </div>
 
             <div>
                 <label for="title" class="label">Short summary</label>
-                <input type="text" class="input" <?= field_attrs('title', true) ?> value="<?= e(old('title')) ?>" required minlength="5" maxlength="150"
+                <input type="text" class="input" data-phi-check <?= field_attrs('title', true) ?> value="<?= e(old('title')) ?>" required minlength="5" maxlength="150"
                        autocomplete="off" data-msg-required="Please give the problem a short summary." data-msg-min="Please add a few more words to the summary.">
                 <p id="title-hint" class="hint">For example: “Printer in Ward 3 not printing”</p>
                 <?= field_error('title') ?>
@@ -73,7 +77,7 @@ $selectedCategory = (string) old('category_id');
 
             <div>
                 <label for="description" class="label">What happened?</label>
-                <textarea class="textarea" <?= field_attrs('description', true) ?> rows="4" required minlength="10" maxlength="5000"
+                <textarea class="textarea" data-phi-check <?= field_attrs('description', true) ?> rows="4" required minlength="10" maxlength="5000"
                           data-msg-required="Please describe what happened." data-msg-min="Please add a little more detail so IT can help."><?= e(old('description')) ?></textarea>
                 <p id="description-hint" class="hint">What were you doing, what did you see, and any error message.</p>
                 <?= field_error('description') ?>
@@ -137,9 +141,10 @@ $selectedCategory = (string) old('category_id');
             </div>
         </section>
 
-        <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+        <!-- Phones and tablets: the send button stays in reach above the bottom navigation while scrolling. -->
+        <div class="sticky-actions">
             <a href="<?= e(url('/')) ?>" class="btn-ghost">Cancel</a>
-            <button type="submit" class="btn-primary text-base sm:px-8" data-loading-text="Sending…"><?= icon('check') ?> Send to IT</button>
+            <button type="submit" class="btn-primary flex-1 text-base lg:flex-none lg:px-8" data-loading-text="Sending…"><?= icon('check') ?> Send to IT</button>
         </div>
     </form>
 </div>

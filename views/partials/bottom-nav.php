@@ -4,7 +4,7 @@ $primary = bottom_nav_items();
 $me = user();
 ?>
 <!-- Mobile bottom navigation: ≤ 5 targets, "New ticket" in the thumb-friendly centre. -->
-<nav class="pb-safe fixed inset-x-0 bottom-0 z-30 border-t border-line bg-white lg:hidden" aria-label="Main navigation">
+<nav class="pb-safe fixed inset-x-0 bottom-0 z-30 border-t border-line bg-white lg:hidden" aria-label="Main navigation" data-bottom-nav>
     <ul class="mx-auto flex max-w-lg items-stretch" role="list">
         <?php foreach ($primary as $item): ?>
             <li class="flex flex-1">
