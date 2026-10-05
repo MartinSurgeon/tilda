@@ -40,6 +40,7 @@ understands the `DELIMITER` lines in `triggers.sql`.
 | File | Change | Then |
 |---|---|---|
 | `migrations/2026_10_05_notification_sound.sql` | `users.notification_sound` (per-person chime setting) | Re-import `change_triggers.sql` |
+| `migrations/2026_10_05_theme.sql` | `users.theme` (day / night-shift / match device) | Re-import `change_triggers.sql` |
 
 Fresh installs already include these in `schema.sql`.
 

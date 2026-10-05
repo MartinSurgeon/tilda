@@ -21,7 +21,7 @@ $hasFilters = $filters['q'] !== '' || $filters['role'] > 0 || $filters['status']
             <p class="font-semibold">Temporary password for <?= e($temp['user']) ?></p>
             <p class="mt-1">Give it to them in person or by phone. It is shown only once, and they must change it when they sign in.</p>
             <div class="mt-3 flex flex-wrap items-center gap-2">
-                <code class="rounded-md bg-white px-3 py-2 font-mono text-base text-ink" id="temp-password"><?= e($temp['password']) ?></code>
+                <code class="rounded-md bg-surface px-3 py-2 font-mono text-base text-ink" id="temp-password"><?= e($temp['password']) ?></code>
                 <button type="button" class="btn-secondary" data-copy="temp-password">Copy</button>
             </div>
         </div>

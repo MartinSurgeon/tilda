@@ -1,10 +1,10 @@
 <?php
 /** @var string $content @var string $title */
-$me = user();
+$me = user(); // set before <html> so the theme renders without a flash of the wrong colours
 $groups = nav_groups();
 ?>
 <!doctype html>
-<html lang="en" class="h-full">
+<html lang="en" class="h-full"<?= in_array($me['theme'] ?? 'system', ['light', 'dark'], true) ? ' data-theme="' . $me['theme'] . '"' : '' ?>>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -25,7 +25,7 @@ $groups = nav_groups();
 <a class="skip-link" href="#main">Skip to main content</a>
 
 <!-- Desktop sidebar -->
-<aside class="fixed inset-y-0 left-0 z-30 hidden w-sidebar flex-col border-r border-line bg-white lg:flex" aria-label="Main navigation">
+<aside class="fixed inset-y-0 left-0 z-30 hidden w-sidebar flex-col border-r border-line bg-surface lg:flex" aria-label="Main navigation">
     <a href="<?= e(url('/')) ?>" class="flex h-16 items-center gap-3 border-b border-line px-5 no-underline hover:no-underline">
         <img src="<?= e(asset('img/logo-mark.svg')) ?>" alt="" class="h-9 w-9">
         <span class="leading-tight">
@@ -47,7 +47,7 @@ $groups = nav_groups();
 
 <div class="flex min-h-full flex-col lg:pl-sidebar">
     <!-- Top bar -->
-    <header class="sticky top-0 z-20 border-b border-line bg-white/95 backdrop-blur">
+    <header class="sticky top-0 z-20 border-b border-line bg-surface/95 backdrop-blur">
         <div class="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:px-6 lg:px-8">
             <a href="<?= e(url('/')) ?>" class="flex items-center gap-2 no-underline hover:no-underline lg:hidden">
                 <img src="<?= e(asset('img/logo-mark.svg')) ?>" alt="" class="h-8 w-8">
@@ -82,12 +82,13 @@ $groups = nav_groups();
                         <span class="avatar" aria-hidden="true"><?= e(initials($me['full_name'])) ?></span>
                         <?= icon('chevron-down', 'h-4 w-4') ?>
                     </summary>
-                    <div class="absolute right-0 mt-2 w-60 rounded-xl border border-line bg-white p-2 shadow-raised">
+                    <div class="absolute right-0 mt-2 w-60 rounded-xl border border-line bg-surface p-2 shadow-raised">
                         <p class="px-3 py-2 text-sm">
                             <span class="block font-semibold text-ink"><?= e($me['full_name']) ?></span>
                             <span class="block truncate text-muted"><?= e($me['email']) ?></span>
                         </p>
                         <a href="<?= e(url('/account')) ?>" class="nav-link"><?= icon('user') ?> My account</a>
+                        <?= App\Core\View::partial('partials/theme-toggle') ?>
                         <form method="post" action="<?= e(url('/logout')) ?>">
                             <?= csrf_field() ?>
                             <button type="submit" class="nav-link w-full"><?= icon('logout') ?> Sign out</button>

@@ -26,7 +26,7 @@ $query = array_filter($filters ?? []);
         foreach ($tabs as $key => [$label, $path]): $current = $tab === $key; ?>
             <li>
                 <a href="<?= e(url($path)) ?>" <?= $current ? 'aria-current="page"' : '' ?>
-                   class="inline-flex min-h-touch items-center rounded-full border px-4 text-sm font-semibold no-underline hover:no-underline <?= $current ? 'border-teal bg-teal text-white' : 'border-line bg-white text-charcoal hover:bg-smoke' ?>"><?= e($label) ?></a>
+                   class="inline-flex min-h-touch items-center rounded-full border px-4 text-sm font-semibold no-underline hover:no-underline <?= $current ? 'border-teal bg-teal text-white' : 'border-line bg-surface text-charcoal hover:bg-smoke' ?>"><?= e($label) ?></a>
             </li>
         <?php endforeach; ?>
     </ul>

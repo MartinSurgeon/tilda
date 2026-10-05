@@ -51,6 +51,8 @@
     --rgb-danger: 180 35 24;        /* #b42318  6.57 on white, 5.75 on tint */
     --rgb-danger-dark: 145 32 24;   /* #912018  hover */
     --rgb-danger-tint: 253 236 234; /* #fdecea */
+    --rgb-danger-fg: 180 35 24;     /* red text & borders; same as danger by day */
+    --rgb-surface: 255 255 255;     /* cards, fields, bars */
     --rgb-neutral-text: 69 69 69;   /* #454545  on neutral-tint 8.19 */
     --rgb-neutral-tint: 237 237 237;/* #ededed */
     --rgb-white-smoke: 245 245 245;
@@ -60,7 +62,77 @@
     --rgb-line-strong: 138 138 138; /* #8a8a8a  form borders, 3.45:1 (UI ≥ 3:1) */
   }
 
+  /* ---------------------------------------------------------------------
+     Night-shift mode: low-glare palette for dimmed wards.
+     Applied when the person chooses "Night" (data-theme="dark"), or chooses
+     "Match device" (no data-theme) and the device is set to dark.
+     Every pair is WCAG AA checked (text ≥ 4.5:1, UI ≥ 3:1): white text keeps
+     its dark fills (teal, danger), red/teal/blue TEXT switches to light tones.
+     Keep both blocks below identical.
+     --------------------------------------------------------------------- */
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --rgb-white-smoke: 16 20 18;    /* page   #101412 */
+    --rgb-white-smoke-1: 30 36 34;
+    --rgb-white-smoke-2: 33 39 37;  /* subtle fill #212725 */
+    --rgb-surface: 26 31 29;        /* cards  #1a1f1d */
+    --rgb-line: 47 55 52;
+    --rgb-line-strong: 118 128 123; /* fields 4.09:1 */
+    --rgb-ink: 236 240 238;         /* 14.5:1 */
+    --rgb-charcoal: 200 207 204;    /* 10.5:1 */
+    --rgb-muted: 160 170 165;       /* 7.0:1 */
+    --rgb-teal-darker: 127 214 176; /* text on tint 7.6:1 */
+    --rgb-teal-tint: 20 54 42;
+    --rgb-green: 46 160 67;
+    --rgb-green-text: 140 220 150;
+    --rgb-green-tint: 22 48 28;
+    --rgb-midnight: 143 179 255;    /* links 8.0:1 */
+    --rgb-midnight-tint: 28 40 70;
+    --rgb-info-text: 138 184 240;
+    --rgb-info-tint: 23 42 66;
+    --rgb-warning: 217 154 58;
+    --rgb-warning-text: 240 194 122;
+    --rgb-warning-tint: 58 42 16;
+    --rgb-danger-fg: 255 143 133;   /* red text 7.6:1 */
+    --rgb-danger-tint: 64 24 22;
+    --rgb-neutral-text: 210 216 213;
+    --rgb-neutral-tint: 45 52 49;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme]) {
+      color-scheme: dark;
+      --rgb-white-smoke: 16 20 18;
+      --rgb-white-smoke-1: 30 36 34;
+      --rgb-white-smoke-2: 33 39 37;
+      --rgb-surface: 26 31 29;
+      --rgb-line: 47 55 52;
+      --rgb-line-strong: 118 128 123;
+      --rgb-ink: 236 240 238;
+      --rgb-charcoal: 200 207 204;
+      --rgb-muted: 160 170 165;
+      --rgb-teal-darker: 127 214 176;
+      --rgb-teal-tint: 20 54 42;
+      --rgb-green: 46 160 67;
+      --rgb-green-text: 140 220 150;
+      --rgb-green-tint: 22 48 28;
+      --rgb-midnight: 143 179 255;
+      --rgb-midnight-tint: 28 40 70;
+      --rgb-info-text: 138 184 240;
+      --rgb-info-tint: 23 42 66;
+      --rgb-warning: 217 154 58;
+      --rgb-warning-text: 240 194 122;
+      --rgb-warning-tint: 58 42 16;
+      --rgb-danger-fg: 255 143 133;
+      --rgb-danger-tint: 64 24 22;
+      --rgb-neutral-text: 210 216 213;
+      --rgb-neutral-tint: 45 52 49;
+    }
+  }
+
   html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+  /* The forms plugin paints unchecked boxes/radios white; follow the theme
+     instead (checked state keeps its teal fill: the plugin's :checked rule wins). */
+  [type="checkbox"], [type="radio"] { background-color: rgb(var(--rgb-surface)); }
   body { @apply bg-smoke text-charcoal antialiased; }
   h1, h2, h3, h4 { @apply text-ink; }
   a { @apply text-midnight underline-offset-2; }
@@ -92,13 +164,13 @@
   }
   .btn:hover { @apply no-underline; }
   .btn-primary   { @apply btn bg-teal text-white hover:bg-teal-dark; }
-  .btn-secondary { @apply btn border border-midnight bg-white text-midnight hover:bg-midnight-tint; }
+  .btn-secondary { @apply btn border border-midnight bg-surface text-midnight hover:bg-midnight-tint; }
   .btn-ghost     { @apply btn text-charcoal hover:bg-smoke; }
   .btn-danger    { @apply btn bg-danger text-white hover:bg-danger-dark; }
   .btn-block     { @apply w-full; }
   .btn-icon      { @apply inline-flex h-11 w-11 items-center justify-center rounded-lg text-charcoal hover:bg-smoke; }
 
-  .card        { @apply rounded-xl border border-line bg-white shadow-card; }
+  .card        { @apply rounded-xl border border-line bg-surface shadow-card; }
   .card-body   { @apply p-4 sm:p-6; }
   .card-header { @apply flex items-center justify-between gap-3 border-b border-line px-4 py-3 sm:px-6; }
   .card-title  { @apply text-base font-semibold text-ink; }
@@ -111,16 +183,16 @@
   .label       { @apply mb-1 block text-sm font-semibold text-ink; }
   .label-optional { @apply font-normal text-muted; }
   .input, .select, .textarea {
-    @apply block w-full min-h-touch rounded-lg border-line-strong bg-white px-3 py-2 text-base text-ink
+    @apply block w-full min-h-touch rounded-lg border-line-strong bg-surface px-3 py-2 text-base text-ink
            placeholder:text-muted focus:border-teal focus:ring-2 focus:ring-teal/30;
   }
   .textarea { @apply min-h-[7rem]; }
   .input[aria-invalid="true"], .select[aria-invalid="true"], .textarea[aria-invalid="true"] {
-    @apply border-danger focus:border-danger focus:ring-danger/30;
+    @apply border-danger-fg focus:border-danger-fg focus:ring-danger-fg/30;
   }
   .checkbox    { @apply h-5 w-5 rounded border-line-strong text-teal focus:ring-teal/30; }
   .hint        { @apply mt-1 text-sm text-muted; }
-  .field-error { @apply mt-1 flex items-start gap-1 text-sm font-medium text-danger; }
+  .field-error { @apply mt-1 flex items-start gap-1 text-sm font-medium text-danger-fg; }
 
   /* Badges: tint background + dark text + icon (never colour alone). */
   .badge { @apply inline-flex items-center gap-1 whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-semibold; }
@@ -129,14 +201,14 @@
   .badge-info    { @apply badge bg-info-tint text-info-text; }
   .badge-midnight{ @apply badge bg-midnight-tint text-midnight; }
   .badge-warning { @apply badge bg-warning-tint text-warning-text; }
-  .badge-danger  { @apply badge bg-danger-tint text-danger; }
+  .badge-danger  { @apply badge bg-danger-tint text-danger-fg; }
   .badge-neutral { @apply badge bg-neutral-tint text-neutral-text; }
 
   .alert { @apply flex items-start gap-3 rounded-lg border px-4 py-3 text-sm; }
   .alert-success { @apply alert border-green/30 bg-green-tint text-green-text; }
   .alert-info    { @apply alert border-cornflower/40 bg-info-tint text-info-text; }
   .alert-warning { @apply alert border-warning/30 bg-warning-tint text-warning-text; }
-  .alert-danger  { @apply alert border-danger/30 bg-danger-tint text-danger; }
+  .alert-danger  { @apply alert border-danger-fg/30 bg-danger-tint text-danger-fg; }
 
   /* Navigation */
   .nav-link {
@@ -149,7 +221,7 @@
   .bottom-nav-link[aria-current="page"] { @apply text-teal-darker; }
 
   .skip-link {
-    @apply sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:shadow-raised;
+    @apply sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-surface focus:px-4 focus:py-2 focus:shadow-raised;
   }
 
   .stat       { @apply card flex items-center gap-4 p-4; }
@@ -180,13 +252,13 @@
   .chart-axis      { fill: rgb(var(--rgb-muted)); font-size: 12px; }
   .chart-value     { fill: rgb(var(--rgb-ink)); font-size: 12px; font-weight: 600; }
   .chart-line      { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
-  .chart-dot       { stroke: #fff; stroke-width: 2; }
+  .chart-dot       { stroke: rgb(var(--rgb-surface)); stroke-width: 2; }
   .series-opened   { stroke: rgb(var(--rgb-cornflower)); }
   .series-resolved { stroke: rgb(var(--rgb-teal)); }
-  .chart-dot.series-opened   { fill: rgb(var(--rgb-cornflower)); stroke: #fff; }
-  .chart-dot.series-resolved { fill: rgb(var(--rgb-teal)); stroke: #fff; }
+  .chart-dot.series-opened   { fill: rgb(var(--rgb-cornflower)); stroke: rgb(var(--rgb-surface)); }
+  .chart-dot.series-resolved { fill: rgb(var(--rgb-teal)); stroke: rgb(var(--rgb-surface)); }
   .chart-crosshair { stroke: rgb(var(--rgb-line-strong)); stroke-width: 1; shape-rendering: crispEdges; }
-  .chart-tooltip   { @apply pointer-events-none absolute z-10 min-w-[8rem] rounded-lg border border-line bg-white px-3 py-2 text-sm shadow-raised; }
+  .chart-tooltip   { @apply pointer-events-none absolute z-10 min-w-[8rem] rounded-lg border border-line bg-surface px-3 py-2 text-sm shadow-raised; }
 
   /* Horizontal meters (single value per row; label + number always shown beside). */
   .meter { -webkit-appearance: none; appearance: none; display: block; width: 100%; height: 0.5rem; border: 0;
@@ -211,7 +283,7 @@
 
   /* Form action bar that stays reachable above the mobile bottom navigation. */
   .sticky-actions {
-    @apply sticky z-20 -mx-4 flex items-center gap-3 border-t border-line bg-white px-4 py-3 shadow-raised
+    @apply sticky z-20 -mx-4 flex items-center gap-3 border-t border-line bg-surface px-4 py-3 shadow-raised
            sm:-mx-6 sm:px-6 lg:static lg:mx-0 lg:justify-end lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none;
     bottom: var(--bottom-nav-height, 4rem);
   }

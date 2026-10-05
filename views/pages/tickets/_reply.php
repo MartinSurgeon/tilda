@@ -28,7 +28,7 @@ use App\Services\Uploads;
             <div class="mt-2">
                 <label for="reply-attachments" class="sr-only">Files</label>
                 <input type="file" id="reply-attachments" name="attachments[]" multiple accept="<?= e(Uploads::acceptAttribute()) ?>"
-                       class="block w-full text-sm text-charcoal file:mr-3 file:min-h-touch file:cursor-pointer file:rounded-lg file:border file:border-midnight file:bg-white file:px-4 file:font-semibold file:text-midnight hover:file:bg-midnight-tint"
+                       class="block w-full text-sm text-charcoal file:mr-3 file:min-h-touch file:cursor-pointer file:rounded-lg file:border file:border-midnight file:bg-surface file:px-4 file:font-semibold file:text-midnight hover:file:bg-midnight-tint"
                        aria-describedby="attachments-hint<?= error('attachments') ? ' attachments-error' : '' ?>" data-max-files="<?= Uploads::MAX_FILES ?>" data-max-bytes="<?= Uploads::maxBytes() ?>">
                 <p id="attachments-hint" class="hint">Up to <?= Uploads::MAX_FILES ?> files, <?= (int) config('uploads.max_mb') ?> MB each (JPG, PNG, WebP or PDF).</p>
                 <?= field_error('attachments') ?>

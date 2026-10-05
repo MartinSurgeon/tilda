@@ -122,7 +122,7 @@ $active = errors() ? old('is_active', '0') === '1' : (!$editing || (int) $user['
             <div class="card-body space-y-4">
                 <?php if ($locked): ?>
                     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                        <p class="text-sm"><span class="font-semibold text-danger">Locked</span> after too many failed sign-ins, until <?= e(fmt_date($user['locked_until'], 'H:i')) ?>.</p>
+                        <p class="text-sm"><span class="font-semibold text-danger-fg">Locked</span> after too many failed sign-ins, until <?= e(fmt_date($user['locked_until'], 'H:i')) ?>.</p>
                         <form method="post" action="<?= e(url('/admin/users/' . $user['id'] . '/unlock')) ?>">
                             <?= csrf_field() ?>
                             <button type="submit" class="btn-secondary"><?= icon('unlock') ?> Unlock now</button>

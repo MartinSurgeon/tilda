@@ -6,7 +6,7 @@ $icons = [
     'ticket.status' => ['refresh', 'bg-midnight-tint text-midnight'],
     'ticket.comment' => ['inbox', 'bg-midnight-tint text-midnight'],
     'ticket.resolved' => ['check-circle', 'bg-green-tint text-green-text'],
-    'ticket.sla_risk' => ['alert-triangle', 'bg-danger-tint text-danger'],
+    'ticket.sla_risk' => ['alert-triangle', 'bg-danger-tint text-danger-fg'],
 ];
 // Group by day so the list is scannable (Today / Yesterday / date).
 $groups = [];
@@ -33,7 +33,7 @@ foreach ($notifications as $n) {
         <?php foreach (['' => 'All', 'unread' => 'Unread'] as $key => $label): $current = ($key === 'unread') === $unreadOnly; ?>
             <li>
                 <a href="<?= e(url('/notifications', ['show' => $key])) ?>" <?= $current ? 'aria-current="page"' : '' ?>
-                   class="inline-flex min-h-touch items-center rounded-full border px-4 text-sm font-semibold no-underline hover:no-underline <?= $current ? 'border-teal bg-teal text-white' : 'border-line bg-white text-charcoal hover:bg-smoke' ?>"><?= e($label) ?></a>
+                   class="inline-flex min-h-touch items-center rounded-full border px-4 text-sm font-semibold no-underline hover:no-underline <?= $current ? 'border-teal bg-teal text-white' : 'border-line bg-surface text-charcoal hover:bg-smoke' ?>"><?= e($label) ?></a>
             </li>
         <?php endforeach; ?>
     </ul>

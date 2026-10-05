@@ -38,6 +38,32 @@
         </form>
     </section>
 
+    <section class="card" id="display" aria-labelledby="display-title">
+        <div class="card-header"><h2 id="display-title" class="card-title">Display</h2></div>
+        <form method="post" action="<?= e(url('/account/theme')) ?>" class="card-body space-y-4">
+            <?= csrf_field() ?>
+            <fieldset>
+                <legend class="text-sm">Night-shift mode uses dark, low-glare colours for dimmed wards and night work. Your choice follows you to any computer you sign in on.</legend>
+                <div class="mt-3 grid gap-3 sm:grid-cols-3">
+                    <?php foreach ([
+                        'light'  => ['Day', 'sun', 'Light colours'],
+                        'dark'   => ['Night shift', 'moon', 'Dark, low-glare colours'],
+                        'system' => ['Match device', 'monitor', 'Follows this computer or phone'],
+                    ] as $value => [$label, $ico, $hint]): $checked = ($me['theme'] ?? 'system') === $value; ?>
+                        <label class="flex min-h-touch cursor-pointer items-start gap-3 rounded-lg border p-3 has-[:checked]:border-teal has-[:checked]:bg-teal-tint <?= $checked ? 'border-teal' : 'border-line' ?>">
+                            <input type="radio" name="theme" value="<?= $value ?>" class="mt-0.5 h-5 w-5 border-line-strong text-teal focus:ring-teal/30" <?= $checked ? 'checked' : '' ?>>
+                            <span>
+                                <span class="flex items-center gap-2 font-semibold text-ink"><?= icon($ico, 'h-4 w-4') ?><?= e($label) ?></span>
+                                <span class="block text-sm text-muted"><?= e($hint) ?></span>
+                            </span>
+                        </label>
+                    <?php endforeach; ?>
+                </div>
+            </fieldset>
+            <button type="submit" class="btn-secondary">Save display</button>
+        </form>
+    </section>
+
     <section class="card" id="sound" aria-labelledby="sound-title">
         <div class="card-header"><h2 id="sound-title" class="card-title">Sound</h2></div>
         <form method="post" action="<?= e(url('/account/sound')) ?>" class="card-body space-y-4">
@@ -65,7 +91,7 @@
                         <li>Reload this page. The <strong>Turn on sound</strong> button should no longer appear.</li>
                     </ol>
                     <div class="flex flex-wrap items-center gap-2">
-                        <code id="site-address" class="rounded-md bg-white px-3 py-2 font-mono text-ink"><?= e($site) ?></code>
+                        <code id="site-address" class="rounded-md bg-surface px-3 py-2 font-mono text-ink"><?= e($site) ?></code>
                         <button type="button" class="btn-secondary" data-copy="site-address">Copy address</button>
                     </div>
                     <p class="text-muted">If you still hear nothing, check that the browser tab is not muted and the volume is up.</p>

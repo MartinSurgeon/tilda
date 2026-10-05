@@ -39,7 +39,7 @@ $selectedCategory = (string) old('category_id');
                 <legend class="label">It is about…</legend>
                 <div class="grid grid-cols-2 gap-2 sm:grid-cols-5" data-category-tiles>
                     <?php foreach ($categories as $c): ?>
-                        <label class="group relative flex min-h-[4.5rem] cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border border-line-strong bg-white p-2 text-center text-sm font-semibold text-ink hover:bg-smoke-2 has-[:checked]:border-teal has-[:checked]:bg-teal-tint has-[:checked]:text-teal-darker has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-midnight">
+                        <label class="group relative flex min-h-[4.5rem] cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border border-line-strong bg-surface p-2 text-center text-sm font-semibold text-ink hover:bg-smoke-2 has-[:checked]:border-teal has-[:checked]:bg-teal-tint has-[:checked]:text-teal-darker has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-midnight">
                             <input type="radio" name="category_id" value="<?= (int) $c['id'] ?>" class="sr-only" required
                                    <?= $selectedCategory === (string) $c['id'] ? 'checked' : '' ?>>
                             <span class="absolute right-1.5 top-1.5 hidden h-5 w-5 items-center justify-center rounded-full bg-teal text-white group-has-[:checked]:flex" aria-hidden="true"><?= icon('check', 'h-3.5 w-3.5') ?></span>
@@ -134,7 +134,7 @@ $selectedCategory = (string) old('category_id');
             <div>
                 <label for="attachments" class="label">Photo or document <span class="label-optional">(optional)</span></label>
                 <input type="file" id="attachments" name="attachments[]" multiple accept="<?= e(Uploads::acceptAttribute()) ?>"
-                       class="block w-full text-sm text-charcoal file:mr-3 file:min-h-touch file:cursor-pointer file:rounded-lg file:border file:border-midnight file:bg-white file:px-4 file:font-semibold file:text-midnight hover:file:bg-midnight-tint"
+                       class="block w-full text-sm text-charcoal file:mr-3 file:min-h-touch file:cursor-pointer file:rounded-lg file:border file:border-midnight file:bg-surface file:px-4 file:font-semibold file:text-midnight hover:file:bg-midnight-tint"
                        aria-describedby="attachments-hint<?= error('attachments') ? ' attachments-error' : '' ?>" data-max-files="<?= Uploads::MAX_FILES ?>" data-max-bytes="<?= Uploads::maxBytes() ?>">
                 <p id="attachments-hint" class="hint">A photo of the screen or error helps. Up to <?= Uploads::MAX_FILES ?> files, <?= (int) config('uploads.max_mb') ?> MB each (JPG, PNG, WebP or PDF).</p>
                 <?= field_error('attachments') ?>

@@ -26,10 +26,10 @@ $canWork = can('ticket.work');
             $current = $view === $key; ?>
             <li>
                 <a href="<?= e(url('/tickets', ['view' => $key])) ?>" <?= $current ? 'aria-current="page"' : '' ?>
-                   class="inline-flex min-h-touch items-center gap-2 rounded-full border px-4 text-sm font-semibold no-underline hover:no-underline <?= $current ? 'border-teal bg-teal text-white' : 'border-line bg-white text-charcoal hover:bg-smoke' ?>">
+                   class="inline-flex min-h-touch items-center gap-2 rounded-full border px-4 text-sm font-semibold no-underline hover:no-underline <?= $current ? 'border-teal bg-teal text-white' : 'border-line bg-surface text-charcoal hover:bg-smoke' ?>">
                     <?= e($label) ?>
                     <?php if ($n !== null): ?>
-                        <span class="rounded-full px-2 text-xs <?= $current ? 'bg-teal-darker text-white' : ($key === 'overdue' && $n > 0 ? 'bg-danger-tint text-danger' : 'bg-smoke text-ink') ?>"><?= $n ?></span>
+                        <span class="rounded-full px-2 text-xs <?= $current ? 'bg-teal-dark text-white' : ($key === 'overdue' && $n > 0 ? 'bg-danger-tint text-danger-fg' : 'bg-smoke text-ink') ?>"><?= $n ?></span>
                     <?php endif; ?>
                 </a>
             </li>

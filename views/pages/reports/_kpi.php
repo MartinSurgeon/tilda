@@ -25,7 +25,7 @@ if ($diff !== null) {
         };
         $text = ($up ? 'Up ' : 'Down ') . $shown . ' on ' . $prevLabel;
         if ($better !== 'none') {
-            $class = ($up === ($better === 'up')) ? 'text-green-text' : 'text-danger';
+            $class = ($up === ($better === 'up')) ? 'text-green-text' : 'text-danger-fg';
         }
     }
 }

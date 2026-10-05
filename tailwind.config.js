@@ -23,7 +23,9 @@ module.exports = {
         cornflower: v('cornflower'),// info accents only (fails AA as text)
         info: { text: v('info-text'), tint: v('info-tint') },
         warning: { DEFAULT: v('warning'), text: v('warning-text'), tint: v('warning-tint') },
-        danger: { DEFAULT: v('danger'), dark: v('danger-dark'), tint: v('danger-tint') },
+        // danger = fill behind white text; danger.fg = red text/borders (lighter in night mode)
+        danger: { DEFAULT: v('danger'), dark: v('danger-dark'), tint: v('danger-tint'), fg: v('danger-fg') },
+        surface: v('surface'),        // cards, fields, bars (white by day, dark grey at night)
         neutral: { text: v('neutral-text'), tint: v('neutral-tint') },
         smoke: { DEFAULT: v('white-smoke'), 1: v('white-smoke-1'), 2: v('white-smoke-2') },
         line: { DEFAULT: v('line'), strong: v('line-strong') },

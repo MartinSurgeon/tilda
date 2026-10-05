@@ -26,7 +26,7 @@ $has = static fn (string $s) => in_array($s, $sections, true);
                 <h2 id="report-title" class="text-lg font-bold text-white">Something not working?</h2>
                 <p class="mt-1 text-sm text-white">Tell IT in under a minute. We will keep you updated here.</p>
             </div>
-            <a href="<?= e(url('/tickets/create')) ?>" class="btn bg-white text-teal-darker hover:bg-teal-tint"><?= icon('plus') ?> Report a problem</a>
+            <a href="<?= e(url('/tickets/create')) ?>" class="btn bg-surface text-teal-darker hover:bg-teal-tint"><?= icon('plus') ?> Report a problem</a>
         </div>
     </section>
 <?php endif; ?>
@@ -54,7 +54,7 @@ $has = static fn (string $s) => in_array($s, $sections, true);
         <div class="grid grid-cols-2 gap-3 lg:grid-cols-4">
             <?= View::partial('components/stat', ['label' => 'Open tickets', 'value' => $k['open_now'], 'icon' => 'inbox', 'tone' => 'bg-info-tint text-info-text', 'href' => can('ticket.view_all') ? url('/tickets', ['view' => 'active']) : null]) ?>
             <?= View::partial('components/stat', ['label' => 'Waiting for a technician', 'value' => $k['unassigned'], 'icon' => 'user-check', 'tone' => 'bg-midnight-tint text-midnight', 'href' => can('ticket.view_all') ? url('/tickets', ['view' => 'unassigned']) : null]) ?>
-            <?= View::partial('components/stat', ['label' => 'Overdue (SLA)', 'value' => $k['overdue'], 'icon' => 'alert-triangle', 'tone' => 'bg-danger-tint text-danger', 'href' => can('ticket.view_all') ? url('/tickets', ['view' => 'overdue']) : null]) ?>
+            <?= View::partial('components/stat', ['label' => 'Overdue (SLA)', 'value' => $k['overdue'], 'icon' => 'alert-triangle', 'tone' => 'bg-danger-tint text-danger-fg', 'href' => can('ticket.view_all') ? url('/tickets', ['view' => 'overdue']) : null]) ?>
             <?= View::partial('components/stat', [
                 'label' => 'Resolved on time this month', 'icon' => 'check-circle', 'tone' => 'bg-green-tint text-green-text',
                 'value' => $k['sla_month'] === null ? '—' : $k['sla_month'] . '%',
@@ -75,7 +75,7 @@ $has = static fn (string $s) => in_array($s, $sections, true);
                 <?= View::partial('components/stat', ['label' => 'Assigned to me', 'value' => (int) ($q['mine'] ?? 0), 'icon' => 'user-check', 'tone' => 'bg-teal-tint text-teal-darker', 'href' => url('/tickets', ['view' => 'mine'])]) ?>
                 <?= View::partial('components/stat', ['label' => 'Unassigned', 'value' => (int) ($q['unassigned'] ?? 0), 'icon' => 'inbox', 'tone' => 'bg-info-tint text-info-text', 'href' => url('/tickets', ['view' => 'unassigned'])]) ?>
                 <?= View::partial('components/stat', ['label' => 'All open', 'value' => (int) ($q['active'] ?? 0), 'icon' => 'ticket', 'tone' => 'bg-midnight-tint text-midnight', 'href' => url('/tickets', ['view' => 'active'])]) ?>
-                <?= View::partial('components/stat', ['label' => 'Overdue (SLA)', 'value' => (int) ($q['overdue'] ?? 0), 'icon' => 'alert-triangle', 'tone' => 'bg-danger-tint text-danger', 'href' => url('/tickets', ['view' => 'overdue'])]) ?>
+                <?= View::partial('components/stat', ['label' => 'Overdue (SLA)', 'value' => (int) ($q['overdue'] ?? 0), 'icon' => 'alert-triangle', 'tone' => 'bg-danger-tint text-danger-fg', 'href' => url('/tickets', ['view' => 'overdue'])]) ?>
             </div>
         <?php endif; ?>
         <div class="card">
@@ -161,7 +161,7 @@ $has = static fn (string $s) => in_array($s, $sections, true);
                                 <?= (int) $w['waiting'] + (int) $w['in_progress'] + (int) $w['on_hold'] ?> open
                                 (<?= (int) $w['in_progress'] ?> in progress, <?= (int) $w['on_hold'] ?> on hold)
                                 · <?= (int) $w['resolved_month'] ?> resolved this month
-                                <?php if ((int) $w['overdue']): ?> · <span class="font-semibold text-danger"><?= (int) $w['overdue'] ?> overdue</span><?php endif; ?>
+                                <?php if ((int) $w['overdue']): ?> · <span class="font-semibold text-danger-fg"><?= (int) $w['overdue'] ?> overdue</span><?php endif; ?>
                             </p>
                         </li>
                     <?php endforeach; ?>
@@ -214,7 +214,7 @@ $has = static fn (string $s) => in_array($s, $sections, true);
         </div>
         <div class="grid grid-cols-2 gap-3 lg:grid-cols-3">
             <?= View::partial('components/stat', ['label' => 'Events recorded', 'value' => $auditToday, 'icon' => 'shield-check', 'tone' => 'bg-midnight-tint text-midnight']) ?>
-            <?= View::partial('components/stat', ['label' => 'Failed sign-ins', 'value' => $failedLoginsToday, 'icon' => 'lock', 'tone' => 'bg-danger-tint text-danger']) ?>
+            <?= View::partial('components/stat', ['label' => 'Failed sign-ins', 'value' => $failedLoginsToday, 'icon' => 'lock', 'tone' => 'bg-danger-tint text-danger-fg']) ?>
             <?= View::partial('components/stat', ['label' => 'Access refused', 'value' => $deniedToday, 'icon' => 'shield', 'tone' => 'bg-warning-tint text-warning-text']) ?>
         </div>
         <?php if ($latestAudit): ?>

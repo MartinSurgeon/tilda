@@ -25,9 +25,9 @@ $awaiting = (int) ($counts['awaiting'] ?? 0);
         <?php foreach (['active' => 'Open', 'done' => 'Resolved & closed'] as $key => $label): $current = $view === $key; ?>
             <li>
                 <a href="<?= e(url('/tickets/mine', ['view' => $key === 'active' ? null : $key])) ?>" <?= $current ? 'aria-current="page"' : '' ?>
-                   class="inline-flex min-h-touch items-center gap-2 rounded-full border px-4 text-sm font-semibold no-underline hover:no-underline <?= $current ? 'border-teal bg-teal text-white' : 'border-line bg-white text-charcoal hover:bg-smoke' ?>">
+                   class="inline-flex min-h-touch items-center gap-2 rounded-full border px-4 text-sm font-semibold no-underline hover:no-underline <?= $current ? 'border-teal bg-teal text-white' : 'border-line bg-surface text-charcoal hover:bg-smoke' ?>">
                     <?= e($label) ?>
-                    <span class="rounded-full px-2 text-xs <?= $current ? 'bg-teal-darker text-white' : 'bg-smoke text-ink' ?>"><?= (int) ($counts[$key] ?? 0) ?></span>
+                    <span class="rounded-full px-2 text-xs <?= $current ? 'bg-teal-dark text-white' : 'bg-smoke text-ink' ?>"><?= (int) ($counts[$key] ?? 0) ?></span>
                 </a>
             </li>
         <?php endforeach; ?>

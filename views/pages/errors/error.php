@@ -17,6 +17,6 @@ $signedIn = session_status() === PHP_SESSION_ACTIVE && App\Core\Auth::check();
         <a href="<?= e(url($signedIn ? '/' : '/login')) ?>" class="btn-primary"><?= $signedIn ? 'Go to dashboard' : 'Go to sign in' ?></a>
     </div>
     <?php if ($debug): ?>
-        <pre class="mt-8 overflow-x-auto rounded-lg bg-ink p-4 text-left text-xs text-white"><?= e($debug::class . ': ' . $debug->getMessage() . "\n" . $debug->getFile() . ':' . $debug->getLine() . "\n\n" . $debug->getTraceAsString()) ?></pre>
+        <pre class="mt-8 overflow-x-auto rounded-lg bg-black p-4 text-left text-xs text-white"><?= e($debug::class . ': ' . $debug->getMessage() . "\n" . $debug->getFile() . ':' . $debug->getLine() . "\n\n" . $debug->getTraceAsString()) ?></pre>
     <?php endif; ?>
 </div>

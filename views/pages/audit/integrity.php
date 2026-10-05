@@ -9,7 +9,7 @@ $labels = ['audit_logs' => 'Activity log', 'db_change_logs' => 'Data change log'
     <section class="<?= $allOk ? 'alert-success' : 'alert-danger' ?>" role="<?= $allOk ? 'status' : 'alert' ?>" aria-labelledby="result-title">
         <?= icon($allOk ? 'shield-check' : 'alert-triangle', 'mt-0.5 h-6 w-6 shrink-0') ?>
         <div class="flex-1">
-            <h2 id="result-title" class="text-base font-bold <?= $allOk ? 'text-green-text' : 'text-danger' ?>">
+            <h2 id="result-title" class="text-base font-bold <?= $allOk ? 'text-green-text' : 'text-danger-fg' ?>">
                 <?= $allOk ? 'Intact: no entry has been changed, removed or inserted' : 'Problem found: the audit log may have been tampered with' ?>
             </h2>
             <ul class="mt-2 space-y-1" role="list">

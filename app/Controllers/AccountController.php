@@ -30,6 +30,22 @@ final class AccountController
         ]);
     }
 
+    /** Day / night-shift / match device. Saved per person, so a shared ward PC follows whoever is signed in. */
+    public function theme(): void
+    {
+        $user = Auth::user();
+        $theme = (string) \App\Core\Request::input('theme', 'system');
+        if (!in_array($theme, ['system', 'light', 'dark'], true)) {
+            $theme = 'system';
+        }
+        if ($theme !== $user['theme']) {
+            DB::run('UPDATE users SET theme = ? WHERE id = ?', [$theme, $user['id']]);
+            AuditLogger::log('account.theme', 'user', $user['id'], 'Display set to ' . ['system' => 'match device', 'light' => 'day', 'dark' => 'night-shift'][$theme]);
+        }
+        Session::flash('success', ['system' => 'Display now matches this device.', 'light' => 'Day mode is on.', 'dark' => 'Night-shift mode is on.'][$theme]);
+        Response::back('/account');
+    }
+
     public function showPassword(): void
     {
         View::show('account/password', [

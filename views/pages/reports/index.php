@@ -229,7 +229,7 @@ $maxIssue = max(1, ...array_map(static fn ($c) => (int) $c['n'], $r['topIssues']
     <div class="card-body space-y-5">
         <dl class="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <?php foreach ($r['backlog']['ages'] as $label => $n): ?>
-                <div class="rounded-lg bg-smoke-2 p-3 <?= $label === 'Over 7 days' && $n > 0 ? 'ring-1 ring-danger/40' : '' ?>">
+                <div class="rounded-lg bg-smoke-2 p-3 <?= $label === 'Over 7 days' && $n > 0 ? 'ring-1 ring-danger-fg/40' : '' ?>">
                     <dt class="text-sm text-muted"><?= e($label) ?></dt>
                     <dd class="text-xl font-bold text-ink"><?= (int) $n ?></dd>
                 </div>

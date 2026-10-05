@@ -94,7 +94,7 @@
     return (message, confirmLabel = 'Yes, continue') => new Promise((resolve) => {
       if (!dlg) {
         dlg = document.createElement('dialog');
-        dlg.className = 'w-[calc(100%-2rem)] max-w-md rounded-xl p-0 backdrop:bg-ink/40';
+        dlg.className = 'w-[calc(100%-2rem)] max-w-md rounded-xl p-0 backdrop:bg-black/50';
         dlg.setAttribute('aria-labelledby', 'confirm-title');
         dlg.innerHTML = `
           <div class="p-6">
@@ -310,6 +310,19 @@
     if (field.value) phiCheck(field);
   });
   enhancePhi(document);
+
+  /* ---------------------------- Day / night switch for "match device" */
+  // The server knows the person's choice; only the browser knows whether the
+  // device is currently dark, so the quick switch offers the opposite of what
+  // is showing right now.
+  $$('[data-theme-toggle]').forEach((btn) => {
+    if (btn.dataset.themeCurrent !== 'system' || !window.matchMedia('(prefers-color-scheme: dark)').matches) return;
+    btn.value = 'light';
+    const [moon, sun] = $$('svg', btn);
+    moon?.classList.add('hidden');
+    sun?.classList.remove('hidden');
+    $('[data-theme-toggle-label]', btn).textContent = 'Day mode';
+  });
 
   /* ------------- Sticky form actions sit exactly on the bottom navigation */
   const bottomNav = $('[data-bottom-nav]');

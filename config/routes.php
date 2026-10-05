@@ -34,6 +34,7 @@ $router->get('/notifications/{id}', [NotificationController::class, 'open']);
 $router->post('/notifications/read-all', [NotificationController::class, 'readAll']);
 $router->post('/account/notifications', [NotificationController::class, 'preferences']);
 $router->post('/account/sound', [NotificationController::class, 'sound']);
+$router->post('/account/theme', [AccountController::class, 'theme']);
 $router->get('/api/poll', [NotificationController::class, 'poll']);
 
 // Administration: users

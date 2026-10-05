@@ -10,13 +10,13 @@
     <link rel="stylesheet" href="<?= e(asset('css/app.css')) ?>">
     <script src="<?= e(asset('js/app.js')) ?>" defer></script>
 </head>
-<body class="h-full bg-white">
+<body class="h-full bg-surface">
 <a class="skip-link" href="#main">Skip to main content</a>
 <div class="flex min-h-full">
     <!-- Brand panel (desktop) -->
     <aside class="relative hidden w-[44%] flex-col justify-between bg-brand-linear-1 p-12 text-white lg:flex" aria-label="About this service">
         <div class="flex items-center gap-3">
-            <img src="<?= e(asset('img/logo-mark.svg')) ?>" alt="" class="h-11 w-11 rounded-xl ring-2 ring-white/30">
+            <img src="<?= e(asset('img/logo-mark.svg')) ?>" alt="" class="h-11 w-11 rounded-xl ring-2 ring-surface/30">
             <span class="text-lg font-bold">RUMA Hospital</span>
         </div>
         <div>
