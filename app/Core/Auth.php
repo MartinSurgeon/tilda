@@ -103,7 +103,7 @@ final class Auth
             $id = Session::get('user_id');
             self::$user = $id ? DB::one(
                 'SELECT u.id, u.full_name, u.email, u.role_id, u.department_id, u.job_title, u.phone,
-                        u.must_change_password, u.is_active, u.password_changed_at, r.slug AS role, r.name AS role_name,
+                        u.must_change_password, u.notification_sound, u.is_active, u.password_changed_at, r.slug AS role, r.name AS role_name,
                         d.name AS department_name
                  FROM users u
                  JOIN roles r ON r.id = u.role_id

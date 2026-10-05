@@ -63,3 +63,13 @@ function unread_notifications(): int
     static $count = null;
     return $count ??= (int) DB::value('SELECT COUNT(*) FROM notifications WHERE user_id = ? AND read_at IS NULL', [Auth::id()]);
 }
+
+/** Should this browser chime for new notifications? Unset = on for IT staff, off for everyone else. */
+function notification_sound_on(): bool
+{
+    $user = user();
+    if (!$user) {
+        return false;
+    }
+    return $user['notification_sound'] === null ? can('ticket.work') : (int) $user['notification_sound'] === 1;
+}

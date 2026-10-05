@@ -420,6 +420,71 @@
   });
   initCharts(document);
 
+  /* =================================================== Notification sound */
+  // Generated with Web Audio (no files, no network). Soft sine chimes only:
+  // they must never resemble the rapid beeps of medical-device alarms.
+  const chime = (() => {
+    let ctx = null;
+    const context = () => {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      ctx = ctx || new AC();
+      return ctx;
+    };
+    // Browsers only allow audio after the person has interacted with the page;
+    // unlock on the first click or key press so later chimes can play.
+    const unlock = () => { const c = context(); if (c && c.state === 'suspended') c.resume().catch(() => {}); };
+    ['pointerdown', 'keydown'].forEach((t) => document.addEventListener(t, unlock, { once: false, passive: true }));
+
+    const note = (c, freq, start, length, peak) => {
+      const osc = c.createOscillator();
+      const gain = c.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(peak, start + 0.02);       // soft attack
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + length);  // gentle fade
+      osc.connect(gain).connect(c.destination);
+      osc.start(start);
+      osc.stop(start + length + 0.05);
+    };
+    return (kind = 'normal') => {
+      const c = context();
+      if (!c || c.state !== 'running') return false;
+      const t = c.currentTime + 0.02;
+      if (kind === 'urgent') {
+        // Brighter rising pair, played twice with a pause: noticeable, not alarming.
+        [0, 0.7].forEach((offset) => { note(c, 784, t + offset, 0.35, 0.22); note(c, 1175, t + offset + 0.16, 0.45, 0.22); });
+      } else {
+        note(c, 659, t, 0.4, 0.14);          // E5
+        note(c, 988, t + 0.14, 0.55, 0.12);  // B5
+      }
+      return true;
+    };
+  })();
+
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-test-sound]');
+    if (!btn) return;
+    // The click itself unlocks audio; wait a tick for the context to resume.
+    setTimeout(() => chime(btn.dataset.testSound), 60);
+  });
+
+  // Chime once per new notification, even with several tabs open: the newest
+  // id that has already chimed is shared through localStorage.
+  const soundOn = $('meta[name="notify-sound"]')?.content === 'on';
+  let lastSeenId = parseInt($('meta[name="last-notification"]')?.content || '0', 10);
+  const sharedLastChimed = {
+    get: () => { try { return parseInt(localStorage.getItem('ruma-last-chimed') || '0', 10); } catch { return 0; } },
+    set: (id) => { try { localStorage.setItem('ruma-last-chimed', String(id)); } catch { /* private mode: per-tab only */ } },
+  };
+  const maybeChime = (latest) => {
+    if (!latest || latest.id <= lastSeenId) return;
+    lastSeenId = latest.id;
+    if (!soundOn || latest.id <= sharedLastChimed.get()) return;
+    if (chime(latest.urgent ? 'urgent' : 'normal')) sharedLastChimed.set(latest.id);
+  };
+
   /* ============================================= Live updates (polling) */
   // Polling, not SSE: on shared hosting a held-open request ties up a PHP
   // worker per open tab. A small request every few seconds scales fine.
@@ -482,8 +547,14 @@
   };
 
   let timer = null;
+  let lastPollAt = 0;
   const poll = async () => {
-    if (document.hidden || !version) return;
+    if (!version) return;
+    // Hidden tabs: only keep listening if the chime is on, and then less often.
+    if (document.hidden) {
+      if (!soundOn || Date.now() - lastPollAt < 30000) return;
+    }
+    lastPollAt = Date.now();
     try {
       const res = await fetch(`${window.RUMA.base()}/api/poll`, {
         headers: { 'X-Background': '1', Accept: 'application/json' },
@@ -493,7 +564,8 @@
       if (!res.ok) return;
       const data = await res.json();
       setBell(data.unread);
-      if (data.version !== version) {
+      maybeChime(data.latest);
+      if (data.version !== version && !document.hidden) { // refresh content when someone can see it
         const { done, changed } = await refreshLive();
         if (done) version = data.version; // otherwise retry on the next tick
         if (changed && announcer) {

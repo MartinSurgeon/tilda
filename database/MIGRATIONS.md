@@ -35,6 +35,14 @@ understands the `DELIMITER` lines in `triggers.sql`.
    `audit_chain_head`. The triggers block updates and deletes. `TRUNCATE`
    bypasses triggers, but the integrity check detects it (see `AUDIT.md`).
 
+## Applied migrations
+
+| File | Change | Then |
+|---|---|---|
+| `migrations/2026_10_05_notification_sound.sql` | `users.notification_sound` (per-person chime setting) | Re-import `change_triggers.sql` |
+
+Fresh installs already include these in `schema.sql`.
+
 ## Compatibility
 
 Tested on MariaDB 10.4 (XAMPP). Written for MySQL 8.0.16+ / MariaDB 10.4+:

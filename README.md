@@ -115,6 +115,13 @@ Polling was chosen over Server-Sent Events because SSE keeps one PHP process bus
 tab, which shared hosting quickly runs out of. Polling pauses in background tabs and does
 not count as activity for the idle sign-out. A region the user is typing in is never replaced.
 
+**Notification sound:** a soft chime plays when a new notification arrives (a brighter chime, twice,
+for Critical tickets and SLA warnings). It is on by default for IT staff and off for everyone else;
+each person can change it, and test both chimes, under *My account → Sound*. Sounds are generated
+in the browser (no audio files) and are deliberately unlike medical-device alarms. With sound on,
+polling continues every 30 seconds in background tabs. Browsers only allow sound after the person
+has clicked or typed on the page at least once.
+
 ## Background jobs (cron)
 
 Run `tools/cron.php` every 5 minutes. In cPanel → *Cron Jobs*:

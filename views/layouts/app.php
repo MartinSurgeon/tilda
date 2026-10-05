@@ -12,6 +12,8 @@ $groups = nav_groups();
     <meta name="base-path" content="<?= e(url('/')) ?>">
     <meta name="theme-color" content="#0d8257">
     <meta name="live-version" content="<?= e(App\Services\LiveVersion::for($me)) ?>">
+    <meta name="notify-sound" content="<?= notification_sound_on() ? 'on' : 'off' ?>">
+    <meta name="last-notification" content="<?= (int) App\Core\DB::value('SELECT MAX(id) FROM notifications WHERE user_id = ?', [$me['id']]) ?>">
     <meta name="poll-interval" content="<?= (int) setting('poll.interval_seconds', '15') ?>">
     <title><?= e(($title ?? 'Dashboard') . ' · ' . config('name')) ?></title>
     <link rel="icon" href="<?= e(url('favicon.svg')) ?>" type="image/svg+xml">

@@ -83,6 +83,19 @@ final class NotificationController
         Response::redirect('/account');
     }
 
+    public function sound(): void
+    {
+        $user = Auth::user();
+        $on = Request::input('sound') === '1' ? 1 : 0;
+        $before = notification_sound_on() ? 1 : 0;
+        DB::run('UPDATE users SET notification_sound = ? WHERE id = ?', [$on, $user['id']]);
+        if ($before !== $on) {
+            AuditLogger::log('account.notification_sound', 'user', $user['id'], $on ? 'Turned notification sound on' : 'Turned notification sound off');
+        }
+        Session::flash('success', $on ? 'Notification sound is on.' : 'Notification sound is off.');
+        Response::redirect('/account#sound');
+    }
+
     /**
      * Polled every ~15 s by the browser. Sent with X-Background, so it never
      * extends the idle timeout. Read-only and cheap.
@@ -90,12 +103,19 @@ final class NotificationController
     public function poll(): void
     {
         $user = Auth::user();
-        $latest = DB::one('SELECT id, title, url FROM notifications WHERE user_id = ? AND read_at IS NULL ORDER BY id DESC LIMIT 1',
-            [(int) $user['id']]);
+        // Urgent = SLA warnings/breaches, or anything about a Critical ticket: these get the brighter chime.
+        $latest = DB::one(
+            "SELECT n.id, n.title, (n.event = 'ticket.sla_risk' OR p.tone = 'critical') AS urgent
+             FROM notifications n
+             LEFT JOIN tickets t ON t.id = n.ticket_id
+             LEFT JOIN priorities p ON p.id = t.priority_id
+             WHERE n.user_id = ? AND n.read_at IS NULL ORDER BY n.id DESC LIMIT 1",
+            [(int) $user['id']]
+        );
         Response::json([
             'unread'  => unread_notifications(),
             'version' => LiveVersion::for($user),
-            'latest'  => $latest ? ['id' => (int) $latest['id'], 'title' => $latest['title']] : null,
+            'latest'  => $latest ? ['id' => (int) $latest['id'], 'title' => $latest['title'], 'urgent' => (bool) $latest['urgent']] : null,
         ]);
     }
 }

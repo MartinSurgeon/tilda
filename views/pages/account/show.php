@@ -38,6 +38,25 @@
         </form>
     </section>
 
+    <section class="card" id="sound" aria-labelledby="sound-title">
+        <div class="card-header"><h2 id="sound-title" class="card-title">Sound</h2></div>
+        <form method="post" action="<?= e(url('/account/sound')) ?>" class="card-body space-y-4">
+            <?= csrf_field() ?>
+            <p class="text-sm">A soft chime when a new notification arrives while this system is open, even in a background tab.
+                Urgent updates (Critical tickets and SLA warnings) play a brighter chime twice. The chimes are deliberately unlike medical alarms.</p>
+            <label class="flex min-h-touch cursor-pointer items-center gap-3 rounded-lg px-2 hover:bg-smoke-2">
+                <input type="checkbox" name="sound" value="1" class="checkbox" <?= notification_sound_on() ? 'checked' : '' ?>>
+                <span class="text-sm text-ink">Play a sound for new notifications</span>
+            </label>
+            <div class="flex flex-col gap-3 sm:flex-row">
+                <button type="submit" class="btn-secondary">Save sound setting</button>
+                <button type="button" class="btn-ghost border border-line" data-test-sound="normal"><?= icon('bell') ?> Play normal chime</button>
+                <button type="button" class="btn-ghost border border-line" data-test-sound="urgent"><?= icon('alert-triangle') ?> Play urgent chime</button>
+            </div>
+            <p class="hint">If you hear nothing, check that this browser tab is not muted and your device volume is up.</p>
+        </form>
+    </section>
+
     <section class="card" aria-labelledby="security-title">
         <div class="card-header"><h2 id="security-title" class="card-title">Security</h2></div>
         <div class="card-body flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

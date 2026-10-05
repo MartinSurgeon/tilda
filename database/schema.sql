@@ -69,6 +69,7 @@ CREATE TABLE users (
     job_title            VARCHAR(100) NULL,
     password_hash        VARCHAR(255) NOT NULL,
     must_change_password TINYINT(1)   NOT NULL DEFAULT 1,
+    notification_sound   TINYINT(1)   NULL DEFAULT NULL,   -- NULL = role default (on for IT staff)
     is_active            TINYINT(1)   NOT NULL DEFAULT 1,
     locked_until         DATETIME     NULL,
     last_login_at        DATETIME     NULL,
