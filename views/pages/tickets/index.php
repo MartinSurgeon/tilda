@@ -132,7 +132,7 @@ $canWork = can('ticket.work');
                 <tr data-kb-item>
                     <td class="max-w-md">
                         <a href="<?= e(url('/tickets/' . $t['id'])) ?>" class="font-semibold text-ink"><?= e($t['title']) ?></a>
-                        <p class="text-muted"><span class="font-mono"><?= e($t['ref']) ?></span> · <?= e($t['requester_name']) ?>, <?= e($t['department_name']) ?> · <?= e(fmt_relative($t['created_at'])) ?></p>
+                        <p class="mt-1 flex items-center gap-1.5 flex-wrap text-muted"><span class="ticket-ref"><?= e($t['ref']) ?></span> <span>·</span> <span><?= e($t['requester_name']) ?>, <?= e($t['department_name']) ?></span> <span>·</span> <span><?= e(fmt_relative($t['created_at'])) ?></span></p>
                     </td>
                     <td><?= TicketMeta::priorityBadge($t['priority_name'], $t['tone'], $t['priority_icon']) ?></td>
                     <td><?= TicketMeta::statusBadge($t['status']) ?></td>

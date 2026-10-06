@@ -8,8 +8,8 @@ final class SecurityHeaders
     public static function send(): void
     {
         // No inline scripts or styles anywhere in the app, so the policy can be strict.
-        header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; "
-            . "img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; "
+        header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; "
+            . "img-src 'self' data:; font-src 'self' https://fonts.gstatic.com; connect-src 'self'; object-src 'none'; "
             . "base-uri 'self'; form-action 'self'; frame-ancestors 'none'");
         header('X-Frame-Options: DENY');
         header('X-Content-Type-Options: nosniff');

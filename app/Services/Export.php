@@ -121,8 +121,8 @@ final class Export
   .foot { margin-top: 10px; color: #666666; font-size: 7px; }
 </style></head><body>
 <table class="brand"><tr>
-  <td style="width:34px"><img src="{$logo}" width="28" height="28" alt=""></td>
-  <td><div class="org">{$org}</div><div class="sub">IT Support &amp; Maintenance</div></td>
+  <td style="width:150px"><img src="{$logo}" height="32" style="height:32px;max-width:145px;width:auto;" alt=""></td>
+  <td><div class="org" style="font-size:12px;font-weight:bold;color:#08573a">IT Support &amp; Maintenance</div></td>
   <td style="text-align:right" class="sub">Generated {$generated}<br>by {$by}</td>
 </tr></table>
 <div class="bar"></div>

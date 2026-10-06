@@ -16,7 +16,7 @@ $canTake = !empty($take) && $t['assignee_id'] === null && in_array($t['status'],
         </div>
         <p class="mt-2 font-semibold text-ink"><?= e($t['title']) ?></p>
         <p class="mt-1 text-sm text-muted">
-            <span class="font-mono"><?= e($t['ref']) ?></span>
+            <span class="ticket-ref mr-1"><?= e($t['ref']) ?></span>
             · <?= e($staff ? $t['requester_name'] . ', ' . $t['department_name'] : $t['category_name']) ?>
         </p>
         <p class="mt-1 flex items-center gap-1 text-sm text-muted">

@@ -23,7 +23,9 @@ $shared = compact('t', 'transitions', 'canAccept', 'canAssign', 'canRelease', 'c
 <a href="<?= e(url($back[0])) ?>" class="mb-3 inline-flex min-h-touch items-center gap-1 text-sm font-semibold"><?= icon('chevron-left', 'h-4 w-4') ?> <?= e($back[1]) ?></a>
 
 <header id="live-ticket-header" data-live class="mb-6">
-    <p class="font-mono text-sm text-muted"><?= e($t['ref']) ?></p>
+    <div>
+        <span class="ticket-ref text-xs"><?= e($t['ref']) ?></span>
+    </div>
     <h1 class="page-title mt-1 break-words"><?= e($t['title']) ?></h1>
     <div class="mt-3 flex flex-wrap items-center gap-2">
         <?= TicketMeta::statusBadge($t['status']) ?>

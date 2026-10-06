@@ -18,7 +18,10 @@ $groups = nav_groups();
     <meta name="shortcuts-default" content="<?= can('ticket.work') ? 'on' : 'off' ?>">
     <meta name="poll-interval" content="<?= (int) setting('poll.interval_seconds', '15') ?>">
     <title><?= e(($title ?? 'Dashboard') . ' · ' . config('name')) ?></title>
-    <link rel="icon" href="<?= e(url('favicon.svg')) ?>" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap">
+    <link rel="stylesheet" href="<?= e(asset('fonts/sora.css')) ?>">
     <link rel="stylesheet" href="<?= e(asset('css/app.css')) ?>">
     <script src="<?= e(asset('js/app.js')) ?>" defer></script>
 </head>
@@ -27,12 +30,8 @@ $groups = nav_groups();
 
 <!-- Desktop sidebar -->
 <aside class="fixed inset-y-0 left-0 z-30 hidden w-sidebar flex-col border-r border-line bg-surface lg:flex" aria-label="Main navigation">
-    <a href="<?= e(url('/')) ?>" class="flex h-16 items-center gap-3 border-b border-line px-5 no-underline hover:no-underline">
-        <img src="<?= e(asset('img/logo-mark.svg')) ?>" alt="" class="h-9 w-9">
-        <span class="leading-tight">
-            <span class="block text-base font-bold text-ink">RUMA Hospital</span>
-            <span class="block text-xs text-muted">IT Support</span>
-        </span>
+    <a href="<?= e(url('/')) ?>" class="flex h-16 items-center border-b border-line px-5 no-underline hover:no-underline">
+        <img src="<?= e(asset('img/logo-mark.png')) ?>" alt="RUMA IT Support" class="h-10 w-auto max-w-[210px] object-contain">
     </a>
     <?= App\Core\View::partial('partials/nav', ['groups' => $groups]) ?>
     <div class="border-t border-line p-3">
@@ -50,9 +49,8 @@ $groups = nav_groups();
     <!-- Top bar -->
     <header class="sticky top-0 z-20 border-b border-line bg-surface/95 backdrop-blur">
         <div class="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:px-6 lg:px-8">
-            <a href="<?= e(url('/')) ?>" class="flex items-center gap-2 no-underline hover:no-underline lg:hidden">
-                <img src="<?= e(asset('img/logo-mark.svg')) ?>" alt="" class="h-8 w-8">
-                <span class="text-base font-bold text-ink">RUMA IT</span>
+            <a href="<?= e(url('/')) ?>" class="flex items-center no-underline hover:no-underline lg:hidden">
+                <img src="<?= e(asset('img/logo-mark.png')) ?>" alt="RUMA IT Support" class="h-9 w-auto max-w-[180px] object-contain">
             </a>
             <p class="hidden truncate text-base font-semibold text-ink lg:block"><?= e($title ?? '') ?></p>
             <!-- Live update status: pulses on each successful update, turns grey when updates fail. -->

@@ -5,7 +5,7 @@ use App\Services\Sla;
 <div class="mx-auto max-w-xl py-4 text-center">
     <span class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-tint text-green-text"><?= icon('check', 'h-8 w-8') ?></span>
     <h1 class="mt-5 text-2xl font-bold">Your ticket has been sent</h1>
-    <p class="mt-2 text-charcoal">Reference <strong class="font-mono text-ink"><?= e($t['ref']) ?></strong></p>
+    <p class="mt-2 text-charcoal flex items-center justify-center gap-1.5">Reference <span class="ticket-ref text-sm font-bold"><?= e($t['ref']) ?></span></p>
 
     <div class="card card-body mt-8 text-left">
         <h2 class="card-title">What happens next</h2>

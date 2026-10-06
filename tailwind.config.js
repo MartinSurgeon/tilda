@@ -35,7 +35,8 @@ module.exports = {
         'brand-linear-1': 'var(--gradient-linear-1)',
       },
       fontFamily: {
-        sans: ['system-ui', '-apple-system', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'],
+        sans: ['Sora', 'system-ui', '-apple-system', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'],
+        mono: ['Sora', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Consolas', 'monospace'],
       },
       minHeight: { touch: '44px' },
       minWidth: { touch: '44px' },

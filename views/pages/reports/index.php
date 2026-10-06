@@ -247,7 +247,7 @@ $maxIssue = max(1, ...array_map(static fn ($c) => (int) $c['n'], $r['topIssues']
                                 <?php else: ?>
                                     <span class="font-semibold text-ink"><?= e($t['title']) ?></span>
                                 <?php endif; ?>
-                                <p class="text-sm text-muted"><span class="font-mono"><?= e($t['ref']) ?></span> · <?= e($t['department_name']) ?> · <?= e($t['assignee_name'] ?? 'Unassigned') ?> · open <?= e(App\Services\Sla::duration(time() - strtotime($t['created_at']))) ?></p>
+                                <p class="text-sm text-muted flex items-center gap-1.5 flex-wrap"><span class="ticket-ref"><?= e($t['ref']) ?></span> <span>·</span> <span><?= e($t['department_name']) ?></span> <span>·</span> <span><?= e($t['assignee_name'] ?? 'Unassigned') ?></span> <span>·</span> <span>open <?= e(App\Services\Sla::duration(time() - strtotime($t['created_at']))) ?></span></p>
                             </div>
                             <div class="flex gap-2"><?= TicketMeta::priorityBadge($t['priority_name'], $t['tone'], $t['priority_icon']) ?><?= TicketMeta::statusBadge($t['status']) ?></div>
                         </li>
