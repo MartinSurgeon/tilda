@@ -26,15 +26,38 @@ final class DB
         if (self::$pdo === null) {
             $c = config('db');
             $dsn = sprintf('mysql:host=%s;port=%d;dbname=%s;charset=utf8mb4', $c['host'], $c['port'], $c['database']);
-            self::$pdo = new PDO($dsn, $c['username'], $c['password'], [
-                PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                PDO::ATTR_EMULATE_PREPARES   => false,
-                PDO::ATTR_STRINGIFY_FETCHES  => false,
-            ]);
-            // Keep MySQL's clock in step with PHP's so NOW() and date() agree.
-            self::$pdo->exec("SET time_zone = '" . (new \DateTime())->format('P') . "'");
-            self::$pdo->exec("SET SESSION sql_mode = 'STRICT_ALL_TABLES,NO_ZERO_DATE,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION'");
+            try {
+                self::$pdo = new PDO($dsn, $c['username'], $c['password'], [
+                    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                    PDO::ATTR_EMULATE_PREPARES   => false,
+                    PDO::ATTR_STRINGIFY_FETCHES  => false,
+                ]);
+                // Keep MySQL's clock in step with PHP's so NOW() and date() agree.
+                self::$pdo->exec("SET time_zone = '" . (new \DateTime())->format('P') . "'");
+                self::$pdo->exec("SET SESSION sql_mode = 'STRICT_ALL_TABLES,NO_ZERO_DATE,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION'");
+            } catch (\PDOException $e) {
+                if (config('debug')) {
+                    throw $e;
+                }
+                http_response_code(500);
+                header('Content-Type: text/html; charset=utf-8');
+                echo '<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Database Connection Error · RUMA IT Support</title>'
+                    . '<style>body{font-family:system-ui,-apple-system,sans-serif;background:#f5f5f5;color:#2b2b2b;margin:0;padding:40px}'
+                    . '.box{max-width:640px;margin:40px auto;background:#fff;padding:32px;border-radius:12px;border:1px solid #e2e2e2;box-shadow:0 4px 12px rgba(0,0,0,0.06)}'
+                    . 'h1{font-size:22px;color:#b42318;margin:0 0 16px}p{line-height:1.6;font-size:15px;color:#545454}code{background:#f7f7f7;padding:3px 6px;border-radius:4px;border:1px solid #e2e2e2;font-size:13px;color:#0d8257}'
+                    . 'ol{padding-left:20px;line-height:1.8;color:#545454;font-size:14px}li{margin-bottom:8px}'
+                    . '.err{background:#fdecea;border:1px solid #fecdca;color:#b42318;padding:12px;border-radius:6px;font-size:13px;margin:16px 0}'
+                    . '</style></head><body>'
+                    . '<div class="box"><h1>Database Connection Failed</h1>'
+                    . '<p>Could not connect to the MySQL database on <code>' . htmlspecialchars($c['host'], ENT_QUOTES, 'UTF-8') . '</code>.</p>'
+                    . '<div class="err"><strong>Error:</strong> ' . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8') . '</div>'
+                    . '<ol><li>Check your <code>.env</code> file credentials (<code>DB_DATABASE</code>, <code>DB_USERNAME</code>, <code>DB_PASSWORD</code>).</li>'
+                    . '<li>In cPanel, verify that the database user has been granted <strong>ALL PRIVILEGES</strong> on the database.</li>'
+                    . '<li>Verify that tables have been imported from <code>database/schema.sql</code> in phpMyAdmin.</li></ol>'
+                    . '</div></body></html>';
+                exit;
+            }
         }
         return self::$pdo;
     }

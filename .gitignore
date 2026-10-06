@@ -1,5 +1,4 @@
 /.env
-/vendor/
 /node_modules/
 /storage/uploads/*
 /storage/logs/*
@@ -9,3 +8,4 @@
 /tools/composer.phar
 .DS_Store
 Thumbs.db
+vendor.zip
