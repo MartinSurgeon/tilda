@@ -160,7 +160,7 @@ final class TicketService
             }
             self::history((int) $t['id'], $from, $to, (int) $actor['id'], $note);
             AuditLogger::log('ticket.status_changed', 'ticket', $t['id'],
-                "{$t['ref']}: " . TicketMeta::STATUSES[$from]['label'] . ' → ' . TicketMeta::STATUSES[$to]['label'],
+                "{$t['ref']}: " . TicketMeta::STATUSES[$from]['label'] . ' -> ' . TicketMeta::STATUSES[$to]['label'],
                 ['from' => $from, 'to' => $to, 'as' => $allowed[$to]['as']]);
         });
 
@@ -189,7 +189,7 @@ final class TicketService
             $name = (string) DB::value('SELECT name FROM priorities WHERE id = ?', [$priorityId]);
             DB::run('INSERT INTO ticket_comments (ticket_id, user_id, body, is_internal) VALUES (?, ?, ?, 1)',
                 [(int) $t['id'], (int) $actor['id'], "Priority changed from {$t['priority_name']} to {$name}. Reason: {$reason}"]);
-            AuditLogger::log('ticket.priority_changed', 'ticket', $t['id'], "{$t['ref']}: priority {$t['priority_name']} → {$name}",
+            AuditLogger::log('ticket.priority_changed', 'ticket', $t['id'], "{$t['ref']}: priority {$t['priority_name']} -> {$name}",
                 ['from' => (int) $t['priority_id'], 'to' => $priorityId, 'reason' => $reason]);
         });
     }

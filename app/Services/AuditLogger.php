@@ -35,7 +35,7 @@ final class AuditLogger
                     $action,
                     $entityType,
                     $entityId === null ? null : (string) $entityId,
-                    mb_substr($description, 0, 500),
+                    mb_substr(str_replace('→', '->', $description), 0, 500),
                     $metadata === [] ? null : json_encode($metadata, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
                     Request::ip(),
                     Request::userAgent(),
