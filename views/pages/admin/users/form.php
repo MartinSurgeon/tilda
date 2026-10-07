@@ -7,7 +7,7 @@ $locked = $editing && $user['locked_until'] !== null && strtotime($user['locked_
 $active = errors() ? old('is_active', '0') === '1' : (!$editing || (int) $user['is_active'] === 1);
 ?>
 <div class="mx-auto max-w-3xl">
-    <a href="<?= e(url('/admin/users')) ?>" class="mb-4 inline-flex min-h-touch items-center gap-1 text-sm font-semibold"><?= icon('chevron-left', 'h-4 w-4') ?> All users</a>
+    <a href="<?= e(url('/admin/users')) ?>" class="back-link mb-4"><?= icon('chevron-left', 'h-4 w-4') ?> All users</a>
 
     <header class="mb-6">
         <h1 class="page-title"><?= $editing ? e($user['full_name']) : 'Add user' ?></h1>

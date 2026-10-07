@@ -20,7 +20,7 @@ foreach ($attachments as $a) {
 }
 $shared = compact('t', 'transitions', 'canAccept', 'canAssign', 'canRelease', 'canPriority', 'technicians', 'priorities', 'isRequester', 'history');
 ?>
-<a href="<?= e(url($back[0])) ?>" class="mb-3 inline-flex min-h-touch items-center gap-1 text-sm font-semibold"><?= icon('chevron-left', 'h-4 w-4') ?> <?= e($back[1]) ?></a>
+<a href="<?= e(url($back[0])) ?>" class="back-link mb-3"><?= icon('chevron-left', 'h-4 w-4') ?> <?= e($back[1]) ?></a>
 
 <header id="live-ticket-header" data-live class="mb-6">
     <div>

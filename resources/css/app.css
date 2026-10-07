@@ -272,13 +272,30 @@
 
   /* Navigation */
   .nav-link {
-    @apply flex min-h-touch items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-charcoal no-underline hover:bg-smoke hover:no-underline;
+    @apply relative flex min-h-touch items-center gap-3 rounded-lg border-l-[3px] border-transparent px-3 py-2 text-sm font-medium text-charcoal no-underline hover:bg-smoke hover:no-underline;
   }
-  .nav-link[aria-current="page"] { @apply bg-teal-tint font-semibold text-teal-darker; }
+  .nav-link[aria-current="page"] { @apply border-teal bg-teal-tint font-semibold text-teal-darker; }
   .bottom-nav-link {
-    @apply flex min-h-touch flex-1 flex-col items-center justify-center gap-0.5 px-1 py-1 text-[11px] font-medium text-charcoal no-underline hover:no-underline;
+    @apply relative flex min-h-touch flex-1 flex-col items-center justify-center gap-0.5 px-1 py-1 text-[11px] font-medium text-charcoal no-underline hover:no-underline;
   }
-  .bottom-nav-link[aria-current="page"] { @apply text-teal-darker; }
+  .bottom-nav-link[aria-current="page"] { @apply font-semibold text-teal-darker; }
+  /* Icon + label alone are too subtle at this size: add a small bar above the active tab. */
+  .bottom-nav-link[aria-current="page"]::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 1.5rem;
+    height: 3px;
+    transform: translateX(-50%);
+    border-radius: 0 0 9999px 9999px;
+    background: rgb(var(--rgb-teal));
+  }
+
+  /* Back links: a breadcrumb-style control, not a coloured inline hyperlink. */
+  .back-link {
+    @apply inline-flex min-h-touch items-center gap-1 text-sm font-semibold text-charcoal no-underline hover:text-teal-darker hover:no-underline;
+  }
 
   .skip-link {
     @apply sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-surface focus:px-4 focus:py-2 focus:shadow-raised;

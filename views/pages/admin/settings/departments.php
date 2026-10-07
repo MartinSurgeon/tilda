@@ -22,13 +22,15 @@ echo App\Core\View::partial('pages/admin/settings/_tabs', ['tab' => 'departments
 
 <section class="card overflow-hidden" aria-label="Departments">
     <?php foreach ($departments as $d): $people = (int) ($usage[$d['id']] ?? 0); ?>
-        <details class="border-b border-line last:border-b-0" data-disclosure>
+        <details class="group border-b border-line last:border-b-0" data-disclosure>
             <summary class="flex min-h-touch cursor-pointer list-none items-center gap-3 px-4 py-2 hover:bg-smoke-2 sm:px-6">
                 <span class="badge-neutral font-mono"><?= e($d['code']) ?></span>
                 <span class="flex-1 text-ink"><?= e($d['name']) ?></span>
                 <?php if (!(int) $d['is_active']): ?><span class="badge-neutral">Hidden</span><?php endif; ?>
                 <span class="hidden text-sm text-muted sm:inline"><?= $people ?> <?= $people === 1 ? 'person' : 'people' ?></span>
-                <span class="text-sm font-semibold text-midnight">Edit</span>
+                <span class="flex items-center gap-1 text-sm font-medium text-muted">
+                    Edit <?= icon('chevron-down', 'h-4 w-4 transition-transform duration-150 group-open:rotate-180') ?>
+                </span>
             </summary>
             <form method="post" action="<?= e(url('/admin/settings/departments/' . $d['id'])) ?>" class="grid gap-3 border-t border-line bg-smoke-2 px-4 py-4 sm:grid-cols-[1fr_10rem] sm:px-6">
                 <?= csrf_field() ?>

@@ -14,7 +14,7 @@ $has = static fn (string $s) => in_array($s, $sections, true);
         <h1 class="page-title text-2xl sm:text-3xl font-extrabold tracking-tight text-ink"><?= e($greeting . ', ' . $firstName) ?></h1>
         <p class="page-subtitle text-sm text-muted font-medium"><?= e($me['role_name']) ?><?= $me['department_name'] ? ' · ' . e($me['department_name']) : '' ?></p>
     </div>
-    <div class="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1 text-xs font-medium text-muted shadow-xs">
+    <div class="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1 text-xs font-medium text-muted shadow-sm">
         <span class="h-2 w-2 rounded-full bg-green animate-pulse" aria-hidden="true"></span>
         <span data-live-stamp aria-live="polite">Updates automatically</span>
     </div>
@@ -42,9 +42,9 @@ $has = static fn (string $s) => in_array($s, $sections, true);
 <?php if ($has('mine')): ?>
     <!-- Most important for staff: tickets waiting for their confirmation. Wrapper always present so a live refresh can fill it. -->
     <div id="live-awaiting" data-live <?= $awaiting ? "" : "hidden" ?>><?php if ($awaiting): ?>
-    <section class="rounded-xl border-2 border-teal/40 bg-teal-tint/40 p-4 sm:p-5 shadow-xs" aria-labelledby="awaiting-title">
+    <section class="rounded-xl border-2 border-teal/40 bg-teal-tint/40 p-4 sm:p-5 shadow-card" aria-labelledby="awaiting-title">
         <div class="flex items-start gap-3 sm:gap-4">
-            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-teal text-white shadow-xs">
+            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-teal text-white shadow-sm">
                 <?= icon('check-circle', 'h-6 w-6') ?>
             </span>
             <div class="flex-1 min-w-0">
@@ -54,7 +54,7 @@ $has = static fn (string $s) => in_array($s, $sections, true);
                     </h2>
                     <span class="badge-teal">Action required</span>
                 </div>
-                <ul class="mt-3 divide-y divide-teal/15 rounded-lg border border-teal/20 bg-surface shadow-xs" role="list">
+                <ul class="mt-3 divide-y divide-teal/15 rounded-lg border border-teal/20 bg-surface shadow-card" role="list">
                     <?php foreach ($awaiting as $a): ?>
                         <li class="flex flex-col gap-2 p-3 sm:flex-row sm:items-center sm:justify-between">
                             <div class="min-w-0 flex-1">

@@ -9,12 +9,14 @@ $row = static function (array $c, bool $top) use ($icons, $usage): string {
     $used = (int) ($usage[$c['id']] ?? 0);
     ob_start(); ?>
     <details class="group" data-disclosure>
-        <summary class="flex min-h-touch cursor-pointer list-none items-center gap-3 px-4 py-2 hover:bg-smoke-2 sm:px-6">
-            <?= $top ? icon($c['icon'], 'h-5 w-5 text-teal-darker') : '<span class="w-5" aria-hidden="true"></span>' ?>
-            <span class="flex-1 <?= $top ? 'font-semibold text-ink' : 'text-ink' ?>"><?= e($c['name']) ?></span>
+        <summary class="flex min-h-touch cursor-pointer list-none items-center gap-3 px-4 py-2 hover:bg-smoke-2 sm:px-6 <?= $top ? '' : 'bg-smoke-2/60 pl-10 sm:pl-14' ?>">
+            <?php if ($top): ?><?= icon($c['icon'], 'h-5 w-5 shrink-0 text-teal-darker') ?><?php endif; ?>
+            <span class="flex-1 <?= $top ? 'font-semibold text-ink' : 'text-charcoal' ?>"><?= e($c['name']) ?></span>
             <?php if (!(int) $c['is_active']): ?><span class="badge-neutral">Hidden</span><?php endif; ?>
             <span class="hidden text-sm text-muted sm:inline"><?= $used ?> <?= $used === 1 ? 'ticket' : 'tickets' ?></span>
-            <span class="text-sm font-semibold text-midnight">Edit</span>
+            <span class="flex items-center gap-1 text-sm font-medium text-muted">
+                Edit <?= icon('chevron-down', 'h-4 w-4 transition-transform duration-150 group-open:rotate-180') ?>
+            </span>
         </summary>
         <form method="post" action="<?= e(url('/admin/settings/categories/' . $c['id'])) ?>" class="grid gap-3 border-t border-line bg-smoke-2 px-4 py-4 sm:grid-cols-2 sm:px-6">
             <?= csrf_field() ?>
