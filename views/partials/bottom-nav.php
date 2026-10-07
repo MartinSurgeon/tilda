@@ -9,7 +9,8 @@ $me = user();
         <?php foreach ($primary as $item): ?>
             <li class="flex flex-1">
                 <a href="<?= e(url($item['path'])) ?>" class="bottom-nav-link" <?= nav_is_active($item['path']) ? 'aria-current="page"' : '' ?>>
-                    <?= icon($item['icon'], 'h-6 w-6') ?><span><?= e($item['label'] === 'Dashboard' ? 'Home' : $item['label']) ?></span>
+                    <span class="bottom-nav-icon"><?= icon($item['icon'], 'h-6 w-6') ?></span>
+                    <span><?= e($item['label'] === 'Dashboard' ? 'Home' : $item['label']) ?></span>
                 </a>
             </li>
         <?php endforeach; ?>
@@ -26,10 +27,10 @@ $me = user();
         <?php endif; ?>
 
         <li class="flex flex-1">
-            <a href="<?= e(url('/notifications')) ?>" class="bottom-nav-link relative" <?= nav_is_active('/notifications') ? 'aria-current="page"' : '' ?>>
-                <span class="relative">
+            <a href="<?= e(url('/notifications')) ?>" class="bottom-nav-link" <?= nav_is_active('/notifications') ? 'aria-current="page"' : '' ?>>
+                <span class="bottom-nav-icon relative">
                     <?= icon('bell', 'h-6 w-6') ?>
-                    <span data-bell-count class="absolute -right-2 -top-1 min-w-[1.1rem] rounded-full bg-danger px-1 text-center text-[10px] font-bold leading-[1.1rem] text-white <?= unread_notifications() ? '' : 'hidden' ?>"><?= unread_notifications() > 99 ? '99+' : unread_notifications() ?></span>
+                    <span data-bell-count class="absolute -right-1 -top-1 min-w-[1.1rem] rounded-full bg-danger px-1 text-center text-[10px] font-bold leading-[1.1rem] text-white <?= unread_notifications() ? '' : 'hidden' ?>"><?= unread_notifications() > 99 ? '99+' : unread_notifications() ?></span>
                 </span>
                 <span>Alerts</span>
             </a>
@@ -37,7 +38,8 @@ $me = user();
 
         <li class="flex flex-1">
             <button type="button" class="bottom-nav-link" data-open-dialog="more-menu" aria-haspopup="dialog">
-                <?= icon('menu', 'h-6 w-6') ?><span>More</span>
+                <span class="bottom-nav-icon"><?= icon('menu', 'h-6 w-6') ?></span>
+                <span>More</span>
             </button>
         </li>
     </ul>

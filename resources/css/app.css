@@ -276,21 +276,12 @@
   }
   .nav-link[aria-current="page"] { @apply border-teal bg-teal-tint font-semibold text-teal-darker; }
   .bottom-nav-link {
-    @apply relative flex min-h-touch flex-1 flex-col items-center justify-center gap-0.5 px-1 py-1 text-[11px] font-medium text-charcoal no-underline hover:no-underline;
+    @apply flex min-h-touch flex-1 flex-col items-center justify-center gap-0.5 px-1 py-1 text-[11px] font-medium text-charcoal no-underline hover:no-underline;
   }
   .bottom-nav-link[aria-current="page"] { @apply font-semibold text-teal-darker; }
-  /* Icon + label alone are too subtle at this size: add a small bar above the active tab. */
-  .bottom-nav-link[aria-current="page"]::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 50%;
-    width: 1.5rem;
-    height: 3px;
-    transform: translateX(-50%);
-    border-radius: 0 0 9999px 9999px;
-    background: rgb(var(--rgb-teal));
-  }
+  /* Icon alone, just changing colour, is too subtle at this size: give the active tab a filled pill. */
+  .bottom-nav-icon { @apply flex h-8 w-12 items-center justify-center rounded-full transition-colors duration-150; }
+  .bottom-nav-link[aria-current="page"] .bottom-nav-icon { @apply bg-teal-tint; }
 
   /* Back links: a breadcrumb-style control, not a coloured inline hyperlink. */
   .back-link {
