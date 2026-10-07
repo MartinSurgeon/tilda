@@ -40,22 +40,22 @@ final class Sla
     public static function state(array $t): array
     {
         if (empty($t['resolve_due_at'])) {
-            return self::out('none', 'No target', 'badge-neutral', 'clock');
+            return self::out('none', 'No target', 'badge-outline-neutral', 'clock');
         }
         $due = strtotime($t['resolve_due_at']);
 
         if (in_array($t['status'], ['resolved', 'closed'], true)) {
             $done = strtotime($t['resolved_at'] ?? $t['closed_at'] ?? 'now');
             return $done <= $due
-                ? self::out('met', 'Within target', 'badge-success', 'check-circle')
-                : self::out('breached', 'Missed target', 'badge-danger', 'alert-triangle');
+                ? self::out('met', 'Within target', 'badge-outline-success', 'check-circle')
+                : self::out('breached', 'Missed target', 'badge-outline-danger', 'alert-triangle');
         }
         // The deadline moves back when the hold ends, so "overdue" would be premature.
         if ($t['status'] === 'on_hold') {
-            return self::out('paused', 'Clock paused', 'badge-neutral', 'pause-circle');
+            return self::out('paused', 'Clock paused', 'badge-outline-neutral', 'pause-circle');
         }
         if (time() > $due) {
-            return self::out('breached', 'Overdue by ' . self::duration(time() - $due), 'badge-danger', 'alert-triangle');
+            return self::out('breached', 'Overdue by ' . self::duration(time() - $due), 'badge-outline-danger', 'alert-triangle');
         }
 
         $start = strtotime($t['created_at']);
@@ -63,8 +63,8 @@ final class Sla
         $warn = (int) ($t['warn_percent'] ?? self::policy((int) $t['priority_id'])['warn_percent']);
         $left = 'Due in ' . self::duration($due - time());
         return (time() - $start) / $total * 100 >= $warn
-            ? self::out('at_risk', $left, 'badge-warning', 'clock')
-            : self::out('on_track', $left, 'badge-teal', 'clock');
+            ? self::out('at_risk', $left, 'badge-outline-warning', 'clock')
+            : self::out('on_track', $left, 'badge-outline-teal', 'clock');
     }
 
     /** "45 min", "3 h 10 min", "2 d 4 h" */

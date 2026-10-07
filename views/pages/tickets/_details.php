@@ -31,10 +31,10 @@ $cancel = $isRequester && isset($transitions['closed']) && $transitions['closed'
                 <dd class="text-ink">
                     <?php if ($t['first_response_at']): $met = strtotime($t['first_response_at']) <= strtotime($t['response_due_at']); ?>
                         <?= e(fmt_date($t['first_response_at'])) ?>
-                        <span class="<?= $met ? 'badge-success' : 'badge-danger' ?> ml-1"><?= icon($met ? 'check' : 'alert-triangle', 'h-3.5 w-3.5') ?><?= $met ? 'On time' : 'Late' ?></span>
+                        <span class="<?= $met ? 'badge-outline-success' : 'badge-outline-danger' ?> ml-1"><?= icon($met ? 'check' : 'alert-triangle', 'h-3.5 w-3.5') ?><?= $met ? 'On time' : 'Late' ?></span>
                     <?php else: ?>
                         Due <?= e(fmt_date($t['response_due_at'])) ?>
-                        <?php if (strtotime($t['response_due_at']) < time()): ?><span class="badge-danger ml-1"><?= icon('alert-triangle', 'h-3.5 w-3.5') ?>Overdue</span><?php endif; ?>
+                        <?php if (strtotime($t['response_due_at']) < time()): ?><span class="badge-outline-danger ml-1"><?= icon('alert-triangle', 'h-3.5 w-3.5') ?>Overdue</span><?php endif; ?>
                     <?php endif; ?>
                 </dd>
             </div>

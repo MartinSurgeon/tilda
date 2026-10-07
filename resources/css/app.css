@@ -258,6 +258,18 @@
   .badge-danger  { @apply badge bg-danger-tint text-danger-fg; }
   .badge-neutral { @apply badge bg-neutral-tint text-neutral-text; }
 
+  /* Outlined variants: used for SLA/timing chips so they read as a distinct
+     category from solid status/priority badges, even when they share a tone
+     (e.g. a "Critical" priority and a "Missed target" SLA chip are both red). */
+  .badge-outline { @apply badge border bg-surface; }
+  .badge-outline-teal    { @apply badge-outline border-teal/40 text-teal-darker; }
+  .badge-outline-success { @apply badge-outline border-green/40 text-green-text; }
+  .badge-outline-info    { @apply badge-outline border-cornflower/50 text-info-text; }
+  .badge-outline-midnight{ @apply badge-outline border-midnight/40 text-midnight; }
+  .badge-outline-warning { @apply badge-outline border-warning/40 text-warning-text; }
+  .badge-outline-danger  { @apply badge-outline border-danger-fg/40 text-danger-fg; }
+  .badge-outline-neutral { @apply badge-outline border-line-strong/50 text-neutral-text; }
+
   .ticket-ref {
     @apply inline-flex items-center rounded border border-line bg-smoke-2 px-2 py-0.5 text-xs font-semibold text-ink tabular-nums;
     font-family: 'Sora', sans-serif;

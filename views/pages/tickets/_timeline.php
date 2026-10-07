@@ -25,7 +25,7 @@ $staffRoles = ['technician', 'it_manager'];
         <ol class="space-y-4" role="list">
             <?php foreach ($items as $item): $r = $item['row']; ?>
                 <?php if ($item['type'] === 'status'): ?>
-                    <li class="flex gap-3 px-1">
+                    <li class="flex gap-3 rounded-lg border border-line bg-surface/70 p-3">
                         <span class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-smoke text-muted"><?= icon(TicketMeta::STATUSES[$r['to_status']]['icon'] ?? 'circle-dot', 'h-4 w-4') ?></span>
                         <div class="min-w-0 text-sm">
                             <p><span class="font-semibold text-ink"><?= e($r['full_name']) ?></span> changed the status to <?= TicketMeta::statusBadge($r['to_status']) ?>
