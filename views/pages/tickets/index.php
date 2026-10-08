@@ -20,16 +20,16 @@ $canWork = can('ticket.work');
 
 <!-- Views (tabs). Scrolls sideways on small screens instead of wrapping. -->
 <nav id="live-tabs" data-live class="-mx-4 mb-4 overflow-x-auto px-4 sm:mx-0 sm:px-0" aria-label="Queue views">
-    <ul class="flex min-w-max gap-2" role="list">
+    <ul class="tab-strip min-w-max" role="list">
         <?php foreach ($views as $key => $label):
             $n = $key === 'done' ? null : (int) ($counts[$key] ?? 0);
             $current = $view === $key; ?>
             <li>
                 <a href="<?= e(url('/tickets', ['view' => $key])) ?>" <?= $current ? 'aria-current="page"' : '' ?>
-                   class="inline-flex min-h-touch items-center gap-2 rounded-full border px-4 text-sm font-semibold no-underline hover:no-underline <?= $current ? 'border-teal bg-teal text-white' : 'border-line bg-surface text-charcoal hover:bg-smoke' ?>">
+                   class="tab">
                     <?= e($label) ?>
                     <?php if ($n !== null): ?>
-                        <span class="rounded-full px-2 text-xs <?= $current ? 'bg-teal-dark text-white' : ($key === 'overdue' && $n > 0 ? 'bg-danger-tint text-danger-fg' : 'bg-smoke text-ink') ?>"><?= $n ?></span>
+                        <span class="tab-count <?= !$current && $key === 'overdue' && $n > 0 ? 'tab-count-alert' : '' ?>"><?= $n ?></span>
                     <?php endif; ?>
                 </a>
             </li>

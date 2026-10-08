@@ -5,6 +5,8 @@ const v = (name) => `rgb(var(--rgb-${name}) / <alpha-value>)`;
 
 module.exports = {
   content: ['./views/**/*.php', './app/**/*.php', './resources/js/**/*.js', './public/assets/js/**/*.js'],
+  // Class names the chart script assembles at runtime; they never appear whole in any file.
+  safelist: ['chart-line', 'chart-area', 'chart-dot', 'series-opened', 'series-resolved'],
   theme: {
     extend: {
       colors: {

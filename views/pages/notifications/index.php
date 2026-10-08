@@ -29,11 +29,11 @@ foreach ($notifications as $n) {
 </header>
 
 <nav class="mb-4" aria-label="Filter notifications">
-    <ul class="flex gap-2" role="list">
+    <ul class="tab-strip" role="list">
         <?php foreach (['' => 'All', 'unread' => 'Unread'] as $key => $label): $current = ($key === 'unread') === $unreadOnly; ?>
             <li>
                 <a href="<?= e(url('/notifications', ['show' => $key])) ?>" <?= $current ? 'aria-current="page"' : '' ?>
-                   class="inline-flex min-h-touch items-center rounded-full border px-4 text-sm font-semibold no-underline hover:no-underline <?= $current ? 'border-teal bg-teal text-white' : 'border-line bg-surface text-charcoal hover:bg-smoke' ?>"><?= e($label) ?></a>
+                   class="tab"><?= e($label) ?></a>
             </li>
         <?php endforeach; ?>
     </ul>

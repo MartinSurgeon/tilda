@@ -17,7 +17,7 @@ $query = array_filter($filters ?? []);
 </header>
 
 <nav class="-mx-4 mb-5 overflow-x-auto px-4 sm:mx-0 sm:px-0" aria-label="Audit sections">
-    <ul class="flex min-w-max gap-2" role="list">
+    <ul class="tab-strip min-w-max" role="list">
         <?php
         $tabs = ['activity' => ['Activity', '/audit'], 'changes' => ['Data changes', '/audit/changes']];
         if (can('audit.verify')) {
@@ -26,7 +26,7 @@ $query = array_filter($filters ?? []);
         foreach ($tabs as $key => [$label, $path]): $current = $tab === $key; ?>
             <li>
                 <a href="<?= e(url($path)) ?>" <?= $current ? 'aria-current="page"' : '' ?>
-                   class="inline-flex min-h-touch items-center rounded-full border px-4 text-sm font-semibold no-underline hover:no-underline <?= $current ? 'border-teal bg-teal text-white' : 'border-line bg-surface text-charcoal hover:bg-smoke' ?>"><?= e($label) ?></a>
+                   class="tab"><?= e($label) ?></a>
             </li>
         <?php endforeach; ?>
     </ul>

@@ -30,8 +30,10 @@ $sumR = array_sum($resolved);
     <noscript><p class="text-sm text-muted">Chart needs JavaScript. See the table below.</p></noscript>
 </div>
 
-<details class="mt-3">
-    <summary class="inline-flex min-h-touch cursor-pointer items-center text-sm font-semibold text-midnight">Show as table</summary>
+<details class="group mt-3">
+    <summary class="inline-flex min-h-touch cursor-pointer list-none items-center gap-1 text-sm font-medium text-muted hover:text-ink">
+        Show as table <?= icon('chevron-down', 'h-4 w-4 transition-transform duration-150 group-open:rotate-180') ?>
+    </summary>
     <div class="mt-2 overflow-x-auto" tabindex="0" role="region" aria-label="Daily figures">
         <table class="table">
             <thead><tr><th scope="col">Day</th><th scope="col" class="text-right">Opened</th><th scope="col" class="text-right">Resolved</th></tr></thead>

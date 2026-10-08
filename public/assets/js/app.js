@@ -450,6 +450,33 @@
     return [1, 2, 5, 10].map((f) => f * mag).find((s) => max / s <= 5) || mag * 10;
   };
 
+  // Monotone cubic curve (Fritsch–Carlson): smooth, but never overshoots the
+  // data, so a curve can't dip below 0 or peak higher than a real day's count.
+  const smoothPath = (pts) => {
+    const n = pts.length;
+    const f = (p) => `${p[0].toFixed(1)},${p[1].toFixed(1)}`;
+    if (n < 3) return pts.map((p, i) => `${i ? 'L' : 'M'}${f(p)}`).join(' ');
+    const dx = [], sl = [];
+    for (let i = 0; i < n - 1; i++) {
+      dx[i] = pts[i + 1][0] - pts[i][0];
+      sl[i] = (pts[i + 1][1] - pts[i][1]) / dx[i];
+    }
+    const t = [sl[0]];
+    for (let i = 1; i < n - 1; i++) t[i] = sl[i - 1] * sl[i] <= 0 ? 0 : (sl[i - 1] + sl[i]) / 2;
+    t[n - 1] = sl[n - 2];
+    for (let i = 0; i < n - 1; i++) {
+      if (sl[i] === 0) { t[i] = 0; t[i + 1] = 0; continue; }
+      const a = t[i] / sl[i], b = t[i + 1] / sl[i], h = Math.hypot(a, b);
+      if (h > 3) { t[i] = (3 * a / h) * sl[i]; t[i + 1] = (3 * b / h) * sl[i]; }
+    }
+    let d = `M${f(pts[0])}`;
+    for (let i = 0; i < n - 1; i++) {
+      const k = dx[i] / 3;
+      d += ` C${(pts[i][0] + k).toFixed(1)},${(pts[i][1] + t[i] * k).toFixed(1)} ${(pts[i + 1][0] - k).toFixed(1)},${(pts[i + 1][1] - t[i + 1] * k).toFixed(1)} ${f(pts[i + 1])}`;
+    }
+    return d;
+  };
+
   const drawChart = (box) => {
     let data;
     try { data = JSON.parse(box.dataset.chart); } catch { return; }
@@ -484,8 +511,14 @@
 
     // 2px lines, ringed end dots, value labels at the end (nudged apart if close).
     const ends = [];
-    data.series.forEach((s) => {
-      const d = s.values.map((v, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+    const paths = data.series.map((s) => smoothPath(s.values.map((v, i) => [x(i), y(v)])));
+    const base = y(0).toFixed(1);
+    // Soft fills first, so no series' fill covers another's line.
+    data.series.forEach((s, si) => {
+      svgEl('path', { class: `chart-area series-${s.key}`, d: `${paths[si]} L${x(n - 1).toFixed(1)},${base} L${x(0).toFixed(1)},${base} Z` }, svg);
+    });
+    data.series.forEach((s, si) => {
+      const d = paths[si];
       svgEl('path', { class: `chart-line series-${s.key}`, d }, svg);
       const last = s.values[n - 1];
       svgEl('circle', { class: `chart-dot series-${s.key}`, cx: x(n - 1), cy: y(last), r: 4 }, svg);
