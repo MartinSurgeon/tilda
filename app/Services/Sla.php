@@ -40,19 +40,19 @@ final class Sla
     public static function state(array $t): array
     {
         if (empty($t['resolve_due_at'])) {
-            return self::out('none', 'No target', 'badge-outline-neutral', 'clock');
+            return self::out('none', 'No deadline', 'badge-outline-neutral', 'clock');
         }
         $due = strtotime($t['resolve_due_at']);
 
         if (in_array($t['status'], ['resolved', 'closed'], true)) {
             $done = strtotime($t['resolved_at'] ?? $t['closed_at'] ?? 'now');
             return $done <= $due
-                ? self::out('met', 'Within target', 'badge-outline-success', 'check-circle')
-                : self::out('breached', 'Missed target', 'badge-outline-danger', 'alert-triangle');
+                ? self::out('met', 'On time', 'badge-outline-success', 'check-circle')
+                : self::out('breached', 'Finished late', 'badge-outline-danger', 'alert-triangle');
         }
         // The deadline moves back when the hold ends, so "overdue" would be premature.
         if ($t['status'] === 'on_hold') {
-            return self::out('paused', 'Clock paused', 'badge-outline-neutral', 'pause-circle');
+            return self::out('paused', 'Timer paused', 'badge-outline-neutral', 'pause-circle');
         }
         if (time() > $due) {
             return self::out('breached', 'Overdue by ' . self::duration(time() - $due), 'badge-outline-danger', 'alert-triangle');

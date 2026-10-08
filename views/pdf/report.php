@@ -27,7 +27,7 @@ $maxIssue = max(1, ...array_map(static fn ($c) => (int) $c['n'], $r['topIssues']
         ['Tickets opened', $s['opened'], $p['opened']],
         ['Tickets resolved', $s['resolved'], $p['resolved']],
         ['Cancelled by requester', $s['cancelled'], $p['cancelled']],
-        ['Fixed within SLA', $pct($s['sla_pct']), $pct($p['sla_pct'])],
+        ['Fixed on time', $pct($s['sla_pct']), $pct($p['sla_pct'])],
         ['First response on time', $pct($s['response_pct']), $pct($p['response_pct'])],
         ['Average first response', RB::minutes($s['avg_response']), RB::minutes($p['avg_response'])],
         ['Average time to fix (excl. hold)', RB::minutes($s['avg_resolution']), RB::minutes($p['avg_resolution'])],
@@ -50,7 +50,7 @@ $maxIssue = max(1, ...array_map(static fn ($c) => (int) $c['n'], $r['topIssues']
 
 <h2>By priority</h2>
 <table class="data">
-    <thead><tr><th>Priority</th><th class="num">Opened</th><th class="num">Resolved</th><th class="num">Within SLA</th><th class="num">Avg response (target)</th><th class="num">Avg time to fix (target)</th></tr></thead>
+    <thead><tr><th>Priority</th><th class="num">Opened</th><th class="num">Resolved</th><th class="num">On time</th><th class="num">Average reply time (goal)</th><th class="num">Average time to fix (goal)</th></tr></thead>
     <tbody>
     <?php foreach ($r['byPriority'] as $x): ?>
         <tr>
@@ -67,7 +67,7 @@ $maxIssue = max(1, ...array_map(static fn ($c) => (int) $c['n'], $r['topIssues']
 
 <h2>By category</h2>
 <table class="data">
-    <thead><tr><th style="width:22%">Category</th><th style="width:38%">Opened</th><th class="num">Opened</th><th class="num">Resolved</th><th class="num">Within SLA</th><th class="num">Avg time to fix</th></tr></thead>
+    <thead><tr><th style="width:22%">Category</th><th style="width:38%">Opened</th><th class="num">Opened</th><th class="num">Resolved</th><th class="num">On time</th><th class="num">Average time to fix</th></tr></thead>
     <tbody>
     <?php foreach ($r['byCategory'] as $x): ?>
         <tr>
@@ -108,7 +108,7 @@ $maxIssue = max(1, ...array_map(static fn ($c) => (int) $c['n'], $r['topIssues']
 
 <h2>Technician workload</h2>
 <table class="data">
-    <thead><tr><th>Technician</th><th class="num">Resolved</th><th class="num">Within SLA</th><th class="num">Avg time to fix</th><th class="num">Open now</th></tr></thead>
+    <thead><tr><th>Technician</th><th class="num">Resolved</th><th class="num">On time</th><th class="num">Average time to fix</th><th class="num">Open now</th></tr></thead>
     <tbody>
     <?php foreach ($r['technicians'] as $x): ?>
         <tr><td><?= e($x['full_name']) ?></td><td class="num"><?= (int) $x['resolved'] ?></td><td class="num"><?= $pct($x['sla_pct']) ?></td>
@@ -117,7 +117,7 @@ $maxIssue = max(1, ...array_map(static fn ($c) => (int) $c['n'], $r['topIssues']
     </tbody>
 </table>
 
-<h2>Open backlog today (<?= (int) $r['backlog']['total'] ?>)</h2>
+<h2>Still open today (<?= (int) $r['backlog']['total'] ?>)</h2>
 <table class="data">
     <thead><tr><?php foreach ($r['backlog']['ages'] as $label => $n): ?><th class="num"><?= e($label) ?></th><?php endforeach; ?></tr></thead>
     <tbody><tr><?php foreach ($r['backlog']['ages'] as $n): ?><td class="num"><strong><?= (int) $n ?></strong></td><?php endforeach; ?></tr></tbody>
@@ -135,4 +135,4 @@ $maxIssue = max(1, ...array_map(static fn ($c) => (int) $c['n'], $r['topIssues']
 <?php endif; ?>
 
 <p style="margin-top:12px;color:#666666">Definitions: Opened = reported in the period. Resolved = marked resolved in the period. Time to fix excludes time on hold.
-    Within SLA = resolved by the priority’s target. Still open at period end = reported before the period ended and not resolved or closed by then.</p>
+    On time = resolved within the time set for its priority. Still open at period end = reported before the period ended and not resolved or closed by then.</p>

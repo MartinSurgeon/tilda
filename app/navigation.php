@@ -20,7 +20,7 @@ function nav_groups(): array
         ],
         'Insights' => [
             ['label' => 'Reports',   'path' => '/reports', 'icon' => 'chart',        'show' => can('report.view')],
-            ['label' => 'Audit log', 'path' => '/audit',   'icon' => 'shield-check', 'show' => can('audit.view')],
+            ['label' => 'Activity log', 'path' => '/audit',   'icon' => 'shield-check', 'show' => can('audit.view')],
         ],
         'Administration' => [
             ['label' => 'Users',    'path' => '/admin/users',    'icon' => 'users',    'show' => can('admin.users')],

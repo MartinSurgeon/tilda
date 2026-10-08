@@ -96,10 +96,10 @@ $maxIssue = max(1, ...array_map(static fn ($c) => (int) $c['n'], $r['topIssues']
     <div class="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-6">
         <?= $kpi(['label' => 'Tickets opened', 'value' => (string) $s['opened'], 'now' => $s['opened'], 'before' => $p['opened'], 'better' => 'none']) ?>
         <?= $kpi(['label' => 'Tickets resolved', 'value' => (string) $s['resolved'], 'now' => $s['resolved'], 'before' => $p['resolved'], 'better' => 'up']) ?>
-        <?= $kpi(['label' => 'Fixed within SLA', 'value' => $pct($s['sla_pct']), 'now' => $s['sla_pct'], 'before' => $p['sla_pct'], 'better' => 'up', 'unit' => ' pts']) ?>
+        <?= $kpi(['label' => 'Fixed on time', 'value' => $pct($s['sla_pct']), 'now' => $s['sla_pct'], 'before' => $p['sla_pct'], 'better' => 'up', 'unit' => ' pts']) ?>
         <?= $kpi(['label' => 'Average first response', 'value' => RB::minutes($s['avg_response']), 'now' => $s['avg_response'], 'before' => $p['avg_response'], 'better' => 'down', 'unit' => ' min']) ?>
         <?= $kpi(['label' => 'Average time to fix', 'value' => RB::minutes($s['avg_resolution']), 'now' => $s['avg_resolution'], 'before' => $p['avg_resolution'], 'better' => 'down', 'unit' => ' min']) ?>
-        <?= $kpi(['label' => 'Still open at period end', 'value' => (string) $s['backlog'], 'now' => $s['backlog'], 'before' => $p['backlog'], 'better' => 'down']) ?>
+        <?= $kpi(['label' => 'Still open at the end', 'value' => (string) $s['backlog'], 'now' => $s['backlog'], 'before' => $p['backlog'], 'better' => 'down']) ?>
     </div>
 </section>
 
@@ -115,7 +115,7 @@ $maxIssue = max(1, ...array_map(static fn ($c) => (int) $c['n'], $r['topIssues']
             <table class="table">
                 <thead><tr>
                     <th scope="col">Priority</th><th scope="col" class="text-right">Opened</th><th scope="col" class="text-right">Resolved</th>
-                    <th scope="col" class="text-right">Within SLA</th><th scope="col" class="hidden text-right sm:table-cell">Avg fix (target)</th>
+                    <th scope="col" class="text-right">On time</th><th scope="col" class="hidden text-right sm:table-cell">Average fix time (goal)</th>
                 </tr></thead>
                 <tbody>
                 <?php foreach ($r['byPriority'] as $x): ?>
@@ -142,7 +142,7 @@ $maxIssue = max(1, ...array_map(static fn ($c) => (int) $c['n'], $r['topIssues']
                 <li>
                     <div class="mb-1 flex items-center justify-between gap-2 text-sm">
                         <span class="flex items-center gap-2 font-semibold text-ink"><?= icon($c['icon'], 'h-4 w-4 text-muted') ?><?= e($c['name']) ?></span>
-                        <span><strong class="text-ink"><?= $n ?></strong> <span class="text-muted">· <?= (int) $c['resolved'] ?> resolved · SLA <?= $pct($c['sla_pct']) ?></span></span>
+                        <span><strong class="text-ink"><?= $n ?></strong> <span class="text-muted">· <?= (int) $c['resolved'] ?> resolved · on time <?= $pct($c['sla_pct']) ?></span></span>
                     </div>
                     <meter class="meter meter-medium" min="0" max="<?= $maxCat ?>" value="<?= $n ?>" aria-label="<?= e($c['name']) ?>: <?= $n ?> opened"><?= $n ?></meter>
                 </li>
@@ -205,7 +205,7 @@ $maxIssue = max(1, ...array_map(static fn ($c) => (int) $c['n'], $r['topIssues']
     <div class="overflow-x-auto" tabindex="0" role="region" aria-label="Technician workload, scrollable table">
         <table class="table">
             <thead><tr>
-                <th scope="col">Technician</th><th scope="col" class="text-right">Resolved</th><th scope="col" class="text-right">Within SLA</th>
+                <th scope="col">Technician</th><th scope="col" class="text-right">Resolved</th><th scope="col" class="text-right">On time</th>
                 <th scope="col" class="hidden text-right sm:table-cell">Avg time to fix</th><th scope="col" class="text-right">Open now</th>
             </tr></thead>
             <tbody>
@@ -225,7 +225,7 @@ $maxIssue = max(1, ...array_map(static fn ($c) => (int) $c['n'], $r['topIssues']
 
 <!-- Last (serial position): what still needs doing. -->
 <section class="card" aria-labelledby="backlog-title">
-    <div class="card-header"><h2 id="backlog-title" class="card-title">Open backlog today</h2><span class="text-sm text-muted"><?= (int) $r['backlog']['total'] ?> open</span></div>
+    <div class="card-header"><h2 id="backlog-title" class="card-title">Still open today</h2><span class="text-sm text-muted"><?= (int) $r['backlog']['total'] ?> open</span></div>
     <div class="card-body space-y-5">
         <dl class="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <?php foreach ($r['backlog']['ages'] as $label => $n): ?>
@@ -264,7 +264,7 @@ $maxIssue = max(1, ...array_map(static fn ($c) => (int) $c['n'], $r['topIssues']
         <li><strong>Opened</strong>: reported during the period. <strong>Resolved</strong>: marked resolved during the period.</li>
         <li><strong>First response</strong>: time from report to the first action by IT (taking the ticket, a reply or a status change).</li>
         <li><strong>Time to fix</strong>: time from report to resolved, not counting time on hold (for example, waiting for a part).</li>
-        <li><strong>Within SLA</strong>: share of resolved tickets fixed by their priority’s target time.</li>
+        <li><strong>On time</strong>: share of fixed tickets that were fixed within the time set for their priority.</li>
         <li><strong>Still open at period end</strong>: reported before the period ended and not resolved or closed by then. Tickets reopened later count by their current state.</li>
         <li>Filters other than dates apply to every section. “Current status” filters by each ticket’s status today.</li>
     </ul>

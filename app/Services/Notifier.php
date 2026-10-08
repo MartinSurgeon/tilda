@@ -20,7 +20,7 @@ final class Notifier
         'ticket.status'   => ['Status changes on my tickets',                          false, false],
         'ticket.resolved' => ['My ticket is resolved and needs my confirmation',       true,  false],
         'ticket.created'  => ['A new ticket is reported',                              false, true],
-        'ticket.sla_risk' => ['A ticket is close to, or past, its SLA target',          true,  true],
+        'ticket.sla_risk' => ['A ticket is close to, or past, its deadline',          true,  true],
     ];
 
     /** @param int[] $userIds */

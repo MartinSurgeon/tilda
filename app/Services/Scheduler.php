@@ -24,7 +24,7 @@ final class Scheduler
             DB::run('UPDATE tickets SET sla_warned_at = NOW() WHERE id = ? AND sla_warned_at IS NULL', [$t['id']]);
             $who = $t['assignee_id'] ? [(int) $t['assignee_id']] : Notifier::itStaffIds();
             Notifier::notify($who, 'ticket.sla_risk', $t,
-                "{$t['ref']} is close to its SLA target",
+                "{$t['ref']} is close to its deadline",
                 'Due ' . fmt_date($t['resolve_due_at']) . ' · ' . $t['priority_name'] . ' · ' . $t['title']);
             AuditLogger::log('ticket.sla_warning', 'ticket', $t['id'], "{$t['ref']} passed its SLA warning point");
         }
@@ -44,7 +44,7 @@ final class Scheduler
             DB::run('UPDATE tickets SET sla_breach_notified_at = NOW() WHERE id = ? AND sla_breach_notified_at IS NULL', [$t['id']]);
             $who = array_merge(Notifier::managerIds(), $t['assignee_id'] ? [(int) $t['assignee_id']] : Notifier::itStaffIds());
             Notifier::notify($who, 'ticket.sla_risk', $t,
-                "{$t['ref']} has missed its SLA target",
+                "{$t['ref']} has missed its deadline",
                 $t['priority_name'] . ' · ' . ($t['assignee_name'] ? 'Assigned to ' . $t['assignee_name'] : 'Not assigned') . ' · ' . $t['title']);
             AuditLogger::log('ticket.sla_breached', 'ticket', $t['id'], "{$t['ref']} missed its resolution target");
         }
@@ -126,13 +126,13 @@ final class Scheduler
              WHERE p.slug = 'audit.verify' AND u.is_active = 1"
         );
         $lines = [
-            'Keep this email. It lets you prove later that the audit log was not rewritten.',
+            'Keep this email. It lets you prove later that the activity log was not rewritten.',
             "Activity log: {$heads['audit_logs']['rows']} entries\n{$heads['audit_logs']['hash']}",
             "Data change log: {$heads['db_change_logs']['rows']} entries\n{$heads['db_change_logs']['hash']}",
         ];
         foreach ($recipients as $r) {
             [$html, $text] = Mailer::renderMessage($r['full_name'], 'Daily audit fingerprint ' . date('j M Y'), $lines,
-                absolute_url('/audit/integrity'), 'Open integrity check');
+                absolute_url('/audit/integrity'), 'Open safety check');
             DB::run('INSERT INTO email_queue (to_email, to_name, subject, body_html, body_text) VALUES (?, ?, ?, ?, ?)',
                 [$r['email'], $r['full_name'], '[RUMA IT] Daily audit fingerprint ' . date('Y-m-d'), $html, $text]);
         }

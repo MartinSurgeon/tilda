@@ -208,7 +208,7 @@ final class SettingsController
                 }
             }
         });
-        Session::flash('success', 'Priorities and SLA targets saved. They apply to new tickets and to tickets whose priority changes.');
+        Session::flash('success', 'Priorities and target times saved. They apply to new tickets and to tickets whose priority changes.');
         Response::redirect('/admin/settings/priorities');
     }
 

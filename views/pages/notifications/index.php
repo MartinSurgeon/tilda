@@ -1,10 +1,11 @@
 <?php
 /** @var array $notifications @var bool $unreadOnly @var int $unread @var int $page @var int $pages */
+// Quiet by default: only the two that need action get colour.
 $icons = [
-    'ticket.created' => ['plus', 'bg-info-tint text-info-text'],
-    'ticket.assigned' => ['user-check', 'bg-teal-tint text-teal-darker'],
-    'ticket.status' => ['refresh', 'bg-midnight-tint text-midnight'],
-    'ticket.comment' => ['inbox', 'bg-midnight-tint text-midnight'],
+    'ticket.created' => ['plus', 'bg-smoke text-muted'],
+    'ticket.assigned' => ['user-check', 'bg-smoke text-muted'],
+    'ticket.status' => ['refresh', 'bg-smoke text-muted'],
+    'ticket.comment' => ['inbox', 'bg-smoke text-muted'],
     'ticket.resolved' => ['check-circle', 'bg-green-tint text-green-text'],
     'ticket.sla_risk' => ['alert-triangle', 'bg-danger-tint text-danger-fg'],
 ];
@@ -54,7 +55,7 @@ foreach ($notifications as $n) {
                 <ul class="card divide-y divide-line overflow-hidden" role="list" data-kb-list>
                     <?php foreach ($items as $n): [$ico, $tone] = $icons[$n['event']] ?? ['bell', 'bg-smoke text-muted']; $isUnread = $n['read_at'] === null; ?>
                         <li data-kb-item>
-                            <a href="<?= e(url('/notifications/' . $n['id'])) ?>" class="flex min-h-touch items-start gap-3 px-4 py-3 text-charcoal no-underline hover:bg-smoke-2 hover:no-underline sm:px-6 <?= $isUnread ? 'bg-teal-tint/40' : '' ?>">
+                            <a href="<?= e(url('/notifications/' . $n['id'])) ?>" class="flex min-h-touch items-start gap-3 px-4 py-3 text-charcoal no-underline hover:bg-smoke-2 hover:no-underline sm:px-6 <?= $isUnread ? 'bg-teal-tint/30' : '' ?>">
                                 <span class="stat-icon h-9 w-9 <?= $tone ?>"><?= icon($ico, 'h-4 w-4') ?></span>
                                 <div class="min-w-0 flex-1">
                                     <p class="<?= $isUnread ? 'font-semibold text-ink' : 'text-ink' ?>"><?= e($n['title']) ?></p>
@@ -62,7 +63,7 @@ foreach ($notifications as $n) {
                                     <p class="mt-1 text-xs text-muted"><?= e(fmt_relative($n['created_at'])) ?></p>
                                 </div>
                                 <?php if ($isUnread): ?>
-                                    <span class="badge-teal mt-1 shrink-0">New<span class="sr-only">, unread</span></span>
+                                    <span class="mt-2 h-2.5 w-2.5 shrink-0 rounded-full bg-teal" aria-hidden="true"></span><span class="sr-only">Unread</span>
                                 <?php endif; ?>
                             </a>
                         </li>

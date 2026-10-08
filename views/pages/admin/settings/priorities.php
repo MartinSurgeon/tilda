@@ -6,7 +6,7 @@ use App\Services\TicketMeta;
 echo App\Core\View::partial('pages/admin/settings/_tabs', ['tab' => 'priorities']);
 ?>
 <form method="post" action="<?= e(url('/admin/settings/priorities')) ?>" class="space-y-4"
-      data-confirm="Save the new SLA targets? They apply to new tickets straight away." data-confirm-label="Save targets">
+      data-confirm="Save the new target times? They apply to new tickets straight away." data-confirm-label="Save targets">
     <?= csrf_field() ?>
     <div class="alert-info">
         <?= icon('info', 'mt-0.5 h-5 w-5 shrink-0') ?>

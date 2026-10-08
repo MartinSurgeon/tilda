@@ -66,7 +66,7 @@ final class TicketActionController
                 ? 'Thank you for confirming. The ticket is closed.' : 'Ticket closed.',
             'reopened'    => 'Ticket reopened. IT has been told.',
             'resolved'    => 'Marked as resolved. The requester will be asked to confirm.',
-            'on_hold'     => 'Ticket is on hold. The SLA clock is paused.',
+            'on_hold'     => 'Ticket is on hold. The timer is paused.',
             'in_progress' => 'Ticket is now in progress.',
         ];
         $this->attempt($id, fn () => TicketService::transition($t, $to, $note, $user),
@@ -88,7 +88,7 @@ final class TicketActionController
             $this->fail($id, 'Please choose a priority.');
         }
         $this->attempt($id, fn () => TicketService::changePriority($t, $priorityId, $reason, $user),
-            'Priority updated. SLA targets were recalculated.');
+            'Priority updated. The target times were worked out again.');
     }
 
     public function comment(int $id): void

@@ -81,7 +81,7 @@ $show = static fn ($v) => $v === null ? '∅' : (is_scalar($v) ? (string) $v : j
                                     </tbody>
                                 </table>
                             </div>
-                            <p class="mt-1 break-all text-xs text-muted">Change #<?= (int) $r['id'] ?> · fingerprint <?= e(substr($r['row_hash'], 0, 16)) ?>…</p>
+                            <p class="mt-1 break-all text-xs text-muted">Change #<?= (int) $r['id'] ?> · seal <?= e(substr($r['row_hash'], 0, 16)) ?>…</p>
                         </details>
                     </div>
                 </div>

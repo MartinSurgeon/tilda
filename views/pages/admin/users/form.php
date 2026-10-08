@@ -12,7 +12,7 @@ $active = errors() ? old('is_active', '0') === '1' : (!$editing || (int) $user['
     <header class="mb-6">
         <h1 class="page-title"><?= $editing ? e($user['full_name']) : 'Add user' ?></h1>
         <p class="page-subtitle"><?= $editing
-            ? 'Changes are recorded in the audit log.'
+            ? 'Changes are recorded in the activity log.'
             : 'A temporary password is created for them. They choose their own when they first sign in.' ?></p>
     </header>
 

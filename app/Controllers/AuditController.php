@@ -28,7 +28,7 @@ final class AuditController
         $this->logView('activity', $f, $page);
 
         View::show('audit/activity', [
-            'title'   => 'Audit log',
+            'title'   => 'Activity log',
             'tab'     => 'activity',
             'filters' => $f,
             'rows'    => Audit::activity($f, self::PER_PAGE, ($page - 1) * self::PER_PAGE),
@@ -50,7 +50,7 @@ final class AuditController
         $this->logView('changes', $f, $page);
 
         View::show('audit/changes', [
-            'title'   => 'Audit log',
+            'title'   => 'Activity log',
             'tab'     => 'changes',
             'filters' => $f,
             'rows'    => Audit::changes($f, self::PER_PAGE, ($page - 1) * self::PER_PAGE),
@@ -122,7 +122,7 @@ final class AuditController
         // PDF: drop the long hash column to keep the table readable.
         $rows = array_map(static fn ($r) => array_slice($map($r), 0, -1), $fetch(self::PDF_LIMIT, 0));
         Export::pdf("ruma-audit-{$label}-{$stamp}.pdf",
-            $type === 'changes' ? 'Audit log: data changes' : 'Audit log: activity',
+            $type === 'changes' ? 'Activity log: record changes' : 'Activity log: who did what',
             $meta, array_slice($headers, 0, -1), $rows);
     }
 
@@ -139,7 +139,7 @@ final class AuditController
         $last = DB::one("SELECT created_at, user_email, metadata FROM audit_logs WHERE action = 'audit.integrity_check' ORDER BY id DESC LIMIT 1");
 
         View::show('audit/integrity', [
-            'title'  => 'Audit log',
+            'title'  => 'Activity log',
             'tab'    => 'integrity',
             'chains' => $chains,
             'result' => Session::pull('_integrity'),

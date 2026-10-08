@@ -38,6 +38,20 @@ final class TicketMeta
         return '<span class="' . $s['badge'] . '">' . icon($s['icon'], 'h-3.5 w-3.5') . e($s['label']) . '</span>';
     }
 
+    /** Deadline chip only when it needs attention (overdue or close). On-track tickets stay quiet. */
+    public static function deadlineAlert(array $t): string
+    {
+        return in_array(Sla::state($t)['state'], ['breached', 'at_risk'], true) ? self::slaBadge($t) : '';
+    }
+
+    /** Priority chip only for Critical and High; Medium and Low are the normal case. */
+    public static function priorityAlert(array $t): string
+    {
+        return in_array($t['tone'], ['critical', 'high'], true)
+            ? self::priorityBadge($t['priority_name'], $t['tone'], $t['priority_icon'])
+            : '';
+    }
+
     public static function priorityBadge(string $name, string $tone, string $icon): string
     {
         $class = self::TONES[$tone] ?? 'badge-neutral';

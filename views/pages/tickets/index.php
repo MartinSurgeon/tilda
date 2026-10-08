@@ -111,7 +111,7 @@ $canWork = can('ticket.work');
             $filters['q'] !== '' || $activeFilters > 0 => ['icon' => 'search', 'title' => 'No tickets match', 'text' => 'Try other words or clear the filters.'],
             $view === 'mine' => ['icon' => 'check-circle', 'title' => 'Nothing assigned to you', 'text' => 'Check the Unassigned tab for tickets waiting for someone.'],
             $view === 'unassigned' => ['icon' => 'check-circle', 'title' => 'Every ticket has an owner', 'text' => 'New tickets will appear here as they come in.'],
-            $view === 'overdue' => ['icon' => 'check-circle', 'title' => 'Nothing overdue', 'text' => 'All open tickets are within their SLA targets.'],
+            $view === 'overdue' => ['icon' => 'check-circle', 'title' => 'Nothing overdue', 'text' => 'All open tickets are still within their target times.'],
             default => ['icon' => 'inbox', 'title' => 'No tickets here', 'text' => 'Tickets will appear here as staff report problems.'],
         }) ?>
     </div>
@@ -124,7 +124,7 @@ $canWork = can('ticket.work');
                     <th scope="col">Priority</th>
                     <th scope="col">Status</th>
                     <th scope="col">Assigned to</th>
-                    <th scope="col">SLA</th>
+                    <th scope="col">Deadline</th>
                 </tr>
             </thead>
             <tbody data-kb-list>
@@ -156,9 +156,9 @@ $canWork = can('ticket.work');
         </table>
     </div>
 
-    <ul class="space-y-3 lg:hidden" role="list" data-kb-list>
+    <ul class="card divide-y divide-line overflow-hidden lg:hidden" role="list" data-kb-list>
         <?php foreach ($tickets as $t): ?>
-            <li data-kb-item><?= App\Core\View::partial('pages/tickets/_card', ['t' => $t, 'staff' => true, 'take' => $here]) ?></li>
+            <li data-kb-item><?= App\Core\View::partial('components/ticket-row', ['t' => $t, 'mode' => 'staff', 'take' => $here]) ?></li>
         <?php endforeach; ?>
     </ul>
 

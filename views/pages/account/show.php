@@ -81,7 +81,7 @@
         <form method="post" action="<?= e(url('/account/sound')) ?>" class="card-body space-y-4">
             <?= csrf_field() ?>
             <p class="text-sm">Plays the notification sound when something new arrives while this system is open, even in a background tab.
-                Urgent updates (Critical tickets and SLA warnings) play it twice, louder.</p>
+                Urgent updates (Critical tickets and tickets close to their deadline) play it twice, louder.</p>
             <label class="flex min-h-touch cursor-pointer items-center gap-3 rounded-lg px-2 hover:bg-smoke-2">
                 <input type="checkbox" name="sound" value="1" class="checkbox" <?= notification_sound_on() ? 'checked' : '' ?>>
                 <span class="text-sm text-ink">Play a sound for new notifications</span>

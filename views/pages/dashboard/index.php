@@ -78,7 +78,7 @@ $has = static fn (string $s) => in_array($s, $sections, true);
     <section id="live-kpi" data-live aria-labelledby="kpi-title">
         <div class="mb-3 flex items-center justify-between">
             <h2 id="kpi-title" class="section-title">Service at a glance</h2>
-            <span class="text-xs text-muted font-medium">Real-time telemetry</span>
+            <span class="text-xs text-muted font-medium">Updates live</span>
         </div>
         <div class="grid grid-cols-2 gap-3 lg:grid-cols-4">
             <?= View::partial('components/stat', [
@@ -86,7 +86,7 @@ $has = static fn (string $s) => in_array($s, $sections, true);
                 'value' => $k['open_now'],
                 'icon'  => 'inbox',
                 'tone'  => 'bg-info-tint text-info-text',
-                'sub'   => 'Active hospital queue',
+                'sub'   => 'Open across the hospital',
                 'href'  => can('ticket.view_all') ? url('/tickets', ['view' => 'active']) : null
             ]) ?>
             <?= View::partial('components/stat', [
@@ -94,11 +94,11 @@ $has = static fn (string $s) => in_array($s, $sections, true);
                 'value' => $k['unassigned'],
                 'icon'  => 'user-check',
                 'tone'  => 'bg-midnight-tint text-midnight',
-                'sub'   => 'Unassigned triage backlog',
+                'sub'   => 'Waiting for a technician to take them',
                 'href'  => can('ticket.view_all') ? url('/tickets', ['view' => 'unassigned']) : null
             ]) ?>
             <?= View::partial('components/stat', [
-                'label' => 'Overdue (SLA)',
+                'label' => 'Overdue',
                 'value' => $k['overdue'],
                 'icon'  => 'alert-triangle',
                 'tone'  => (int)$k['overdue'] > 0 ? 'bg-danger-tint text-danger-fg ring-1 ring-danger-fg/30' : 'bg-smoke text-muted',
@@ -106,7 +106,7 @@ $has = static fn (string $s) => in_array($s, $sections, true);
                 'href'  => can('ticket.view_all') ? url('/tickets', ['view' => 'overdue']) : null
             ]) ?>
             <?= View::partial('components/stat', [
-                'label' => 'Resolved on time this month',
+                'label' => 'Fixed on time this month',
                 'value' => $k['sla_month'] === null ? '—' : $k['sla_month'] . '%',
                 'icon'  => 'check-circle',
                 'tone'  => 'bg-green-tint text-green-text',
@@ -136,7 +136,7 @@ $has = static fn (string $s) => in_array($s, $sections, true);
                 <?= View::partial('components/stat', ['label' => 'Assigned to me', 'value' => (int) ($q['mine'] ?? 0), 'icon' => 'user-check', 'tone' => 'bg-teal-tint text-teal-darker', 'sub' => 'My active workload', 'href' => url('/tickets', ['view' => 'mine'])]) ?>
                 <?= View::partial('components/stat', ['label' => 'Unassigned', 'value' => (int) ($q['unassigned'] ?? 0), 'icon' => 'inbox', 'tone' => 'bg-info-tint text-info-text', 'sub' => 'Ready for pickup', 'href' => url('/tickets', ['view' => 'unassigned'])]) ?>
                 <?= View::partial('components/stat', ['label' => 'All open', 'value' => (int) ($q['active'] ?? 0), 'icon' => 'ticket', 'tone' => 'bg-midnight-tint text-midnight', 'sub' => 'Hospital-wide active', 'href' => url('/tickets', ['view' => 'active'])]) ?>
-                <?= View::partial('components/stat', ['label' => 'Overdue (SLA)', 'value' => (int) ($q['overdue'] ?? 0), 'icon' => 'alert-triangle', 'tone' => (int)($q['overdue'] ?? 0) > 0 ? 'bg-danger-tint text-danger-fg ring-1 ring-danger-fg/30' : 'bg-smoke text-muted', 'sub' => (int)($q['overdue'] ?? 0) > 0 ? 'Breached resolution targets' : 'None breached', 'href' => url('/tickets', ['view' => 'overdue'])]) ?>
+                <?= View::partial('components/stat', ['label' => 'Overdue', 'value' => (int) ($q['overdue'] ?? 0), 'icon' => 'alert-triangle', 'tone' => (int)($q['overdue'] ?? 0) > 0 ? 'bg-danger-tint text-danger-fg ring-1 ring-danger-fg/30' : 'bg-smoke text-muted', 'sub' => (int)($q['overdue'] ?? 0) > 0 ? 'Past their deadline' : 'None late', 'href' => url('/tickets', ['view' => 'overdue'])]) ?>
             </div>
         <?php endif; ?>
         <div class="card overflow-hidden">
@@ -146,32 +146,7 @@ $has = static fn (string $s) => in_array($s, $sections, true);
             <?php else: ?>
                 <ul class="divide-y divide-line" role="list" data-kb-list>
                     <?php foreach ($attention as $t): ?>
-                        <li data-kb-item>
-                            <a href="<?= e(url('/tickets/' . $t['id'])) ?>" class="group flex min-h-touch flex-col gap-2.5 px-4 py-3.5 text-charcoal no-underline hover:bg-smoke-2/70 hover:no-underline transition-colors sm:flex-row sm:items-center sm:px-6">
-                                <div class="min-w-0 flex-1">
-                                    <div class="flex items-center gap-2">
-                                        <span class="ticket-ref">
-                                            <?= e($t['ref']) ?>
-                                        </span>
-                                        <p class="truncate font-bold text-ink group-hover:text-teal-darker transition-colors"><?= e($t['title']) ?></p>
-                                    </div>
-                                    <p class="mt-1 text-xs text-muted flex items-center gap-1.5 flex-wrap">
-                                        <span><?= e($t['department_name']) ?></span>
-                                        <span>·</span>
-                                        <span class="inline-flex items-center gap-1">
-                                            <?= icon('user', 'h-3.5 w-3.5') ?> <?= $t['assignee_id'] ? 'Assigned to you' : '<span class="text-warning-text font-medium">Unassigned</span>' ?>
-                                        </span>
-                                    </p>
-                                </div>
-                                <div class="flex flex-wrap items-center gap-2 shrink-0">
-                                    <?= TicketMeta::priorityBadge($t['priority_name'], $t['tone'], $t['priority_icon']) ?>
-                                    <?= TicketMeta::slaBadge($t) ?>
-                                    <span class="text-muted transition-transform duration-150 group-hover:translate-x-0.5 group-hover:text-ink hidden sm:inline-block ml-1" aria-hidden="true">
-                                        <?= icon('chevron-right', 'h-4 w-4') ?>
-                                    </span>
-                                </div>
-                            </a>
-                        </li>
+                        <li data-kb-item><?= View::partial('components/ticket-row', ['t' => $t, 'mode' => 'staff']) ?></li>
                     <?php endforeach; ?>
                 </ul>
             <?php endif; ?>
@@ -185,7 +160,7 @@ $has = static fn (string $s) => in_array($s, $sections, true);
             <div class="card-header">
                 <div>
                     <h2 id="trend-title" class="card-title">Activity trend</h2>
-                    <p class="text-xs text-muted mt-0.5">Opened vs resolved issues across the last 14 days</p>
+                    <p class="text-xs text-muted mt-0.5">Tickets opened and fixed over the last 14 days</p>
                 </div>
             </div>
             <div class="card-body">
@@ -196,7 +171,7 @@ $has = static fn (string $s) => in_array($s, $sections, true);
             <div class="card-header">
                 <div>
                     <h2 id="prio-title" class="card-title">Open by priority</h2>
-                    <p class="text-xs text-muted mt-0.5">Distribution across clinical urgency tiers</p>
+                    <p class="text-xs text-muted mt-0.5">How urgent the open tickets are</p>
                 </div>
             </div>
             <?php $maxP = max(1, ...array_map(static fn ($p) => (int) $p['total'], $byPriority)); ?>
@@ -217,7 +192,7 @@ $has = static fn (string $s) => in_array($s, $sections, true);
             <div class="card-header">
                 <div>
                     <h2 id="workload-title" class="card-title">Technician workload</h2>
-                    <p class="text-xs text-muted mt-0.5">Current operational capacity and active ticket queue per technician</p>
+                    <p class="text-xs text-muted mt-0.5">Open tickets each technician is handling right now</p>
                 </div>
             </div>
             <?php if (!$workload): ?>
@@ -294,27 +269,7 @@ $has = static fn (string $s) => in_array($s, $sections, true);
             <?php else: ?>
                 <ul class="divide-y divide-line" role="list" data-kb-list>
                     <?php foreach ($myTickets as $t): ?>
-                        <li data-kb-item>
-                            <a href="<?= e(url('/tickets/' . $t['id'])) ?>" class="group flex min-h-touch items-center gap-3 px-4 py-3.5 text-charcoal no-underline hover:bg-smoke-2/70 hover:no-underline transition-colors sm:px-6">
-                                <div class="min-w-0 flex-1">
-                                    <div class="flex items-center gap-2">
-                                        <span class="ticket-ref">
-                                            <?= e($t['ref']) ?>
-                                        </span>
-                                        <p class="truncate font-bold text-ink group-hover:text-teal-darker transition-colors"><?= e($t['title']) ?></p>
-                                    </div>
-                                    <p class="mt-1 text-xs text-muted flex items-center gap-2 flex-wrap">
-                                        <span><?= e($t['assignee_name'] ? $t['assignee_name'] . ' is on it' : 'Waiting for IT assignment') ?></span>
-                                        <span>·</span>
-                                        <span>Updated <?= e(fmt_relative($t['updated_at'])) ?></span>
-                                    </p>
-                                </div>
-                                <?= TicketMeta::statusBadge($t['status']) ?>
-                                <span class="text-muted transition-transform duration-150 group-hover:translate-x-0.5 group-hover:text-ink shrink-0" aria-hidden="true">
-                                    <?= icon('chevron-right', 'h-4 w-4') ?>
-                                </span>
-                            </a>
-                        </li>
+                        <li data-kb-item><?= View::partial('components/ticket-row', ['t' => $t, 'mode' => 'mine']) ?></li>
                     <?php endforeach; ?>
                 </ul>
             <?php endif; ?>
@@ -325,13 +280,13 @@ $has = static fn (string $s) => in_array($s, $sections, true);
 <?php if ($has('audit')): ?>
     <section id="live-audit" data-live aria-labelledby="audit-title">
         <div class="mb-3 flex items-center justify-between">
-            <h2 id="audit-title" class="section-title">Audit trail today</h2>
-            <a href="<?= e(url('/audit')) ?>" class="inline-flex min-h-touch items-center gap-1 text-sm font-semibold text-midnight hover:underline">Open audit log <?= icon('chevron-right', 'h-4 w-4') ?></a>
+            <h2 id="audit-title" class="section-title">Activity today</h2>
+            <a href="<?= e(url('/audit')) ?>" class="inline-flex min-h-touch items-center gap-1 text-sm font-semibold text-midnight hover:underline">Open activity log <?= icon('chevron-right', 'h-4 w-4') ?></a>
         </div>
         <div class="grid grid-cols-2 gap-3 lg:grid-cols-3">
-            <?= View::partial('components/stat', ['label' => 'Events recorded', 'value' => $auditToday, 'icon' => 'shield-check', 'tone' => 'bg-midnight-tint text-midnight', 'sub' => 'Tamper-evident activity log']) ?>
-            <?= View::partial('components/stat', ['label' => 'Failed sign-ins', 'value' => $failedLoginsToday, 'icon' => 'lock', 'tone' => (int)$failedLoginsToday > 0 ? 'bg-danger-tint text-danger-fg ring-1 ring-danger-fg/30' : 'bg-smoke text-muted', 'sub' => 'Authentication failures']) ?>
-            <?= View::partial('components/stat', ['label' => 'Access refused', 'value' => $deniedToday, 'icon' => 'shield', 'tone' => (int)$deniedToday > 0 ? 'bg-warning-tint text-warning-text' : 'bg-smoke text-muted', 'sub' => 'Permission violations']) ?>
+            <?= View::partial('components/stat', ['label' => 'Actions recorded', 'value' => $auditToday, 'icon' => 'shield-check', 'tone' => 'bg-midnight-tint text-midnight', 'sub' => 'Permanent record of activity']) ?>
+            <?= View::partial('components/stat', ['label' => 'Failed sign-ins', 'value' => $failedLoginsToday, 'icon' => 'lock', 'tone' => (int)$failedLoginsToday > 0 ? 'bg-danger-tint text-danger-fg ring-1 ring-danger-fg/30' : 'bg-smoke text-muted', 'sub' => 'Wrong password attempts']) ?>
+            <?= View::partial('components/stat', ['label' => 'Blocked from a page', 'value' => $deniedToday, 'icon' => 'shield', 'tone' => (int)$deniedToday > 0 ? 'bg-warning-tint text-warning-text' : 'bg-smoke text-muted', 'sub' => 'Tried to open pages they may not use']) ?>
         </div>
         <?php if ($latestAudit): ?>
             <ul class="card mt-3 divide-y divide-line overflow-hidden" role="list" aria-label="Latest events">

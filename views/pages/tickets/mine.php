@@ -42,9 +42,9 @@ $awaiting = (int) ($counts['awaiting'] ?? 0);
             : ['icon' => 'archive', 'title' => 'Nothing here yet', 'text' => 'Tickets move here once they are resolved or closed.']) ?>
     </div>
 <?php else: ?>
-    <ul class="grid gap-3 md:grid-cols-2" role="list" data-kb-list>
+    <ul class="card divide-y divide-line overflow-hidden" role="list" data-kb-list>
         <?php foreach ($tickets as $t): ?>
-            <li data-kb-item><?= App\Core\View::partial('pages/tickets/_card', ['t' => $t, 'staff' => false]) ?></li>
+            <li data-kb-item><?= App\Core\View::partial('components/ticket-row', ['t' => $t, 'mode' => 'mine']) ?></li>
         <?php endforeach; ?>
     </ul>
     <?= App\Core\View::partial('components/pagination', ['page' => $page, 'pages' => $pages, 'path' => '/tickets/mine',

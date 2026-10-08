@@ -88,8 +88,8 @@ final class ReportController
             ['Average first response (minutes)', $s['avg_response'], $p['avg_response']],
             ['First response on time', $pct($s['response_pct']), $pct($p['response_pct'])],
             ['Average resolution (minutes, excl. hold)', $s['avg_resolution'], $p['avg_resolution']],
-            ['Resolved within SLA', $pct($s['sla_pct']), $pct($p['sla_pct'])],
-            ['Open backlog at period end', $s['backlog'], $p['backlog']],
+            ['Fixed on time', $pct($s['sla_pct']), $pct($p['sla_pct'])],
+            ['Still open at the end', $s['backlog'], $p['backlog']],
         ] as $row) {
             yield ['Summary', ...$row];
         }
@@ -97,13 +97,13 @@ final class ReportController
         foreach ($r['trend'] as $day => $v) {
             yield ['By day', $day, $v['opened'], $v['resolved']];
         }
-        yield ['By priority', 'Priority', 'Opened', 'Resolved', 'Within SLA', 'Avg response (min)', 'Avg resolution (min)'];
+        yield ['By priority', 'Priority', 'Opened', 'Resolved', 'On time', 'Average reply time (min)', 'Average fix time (min)'];
         foreach ($r['byPriority'] as $x) {
             yield ['By priority', $x['name'], (int) $x['opened'], (int) $x['resolved'], $pct($x['sla_pct']),
                    $x['avg_response'] === null ? '' : (int) round((float) $x['avg_response']),
                    $x['avg_resolution'] === null ? '' : (int) round((float) $x['avg_resolution'])];
         }
-        yield ['By category', 'Category', 'Opened', 'Resolved', 'Within SLA', 'Avg resolution (min)'];
+        yield ['By category', 'Category', 'Opened', 'Resolved', 'On time', 'Average fix time (min)'];
         foreach ($r['byCategory'] as $x) {
             yield ['By category', $x['name'], (int) $x['opened'], (int) $x['resolved'], $pct($x['sla_pct']),
                    $x['avg_resolution'] === null ? '' : (int) round((float) $x['avg_resolution'])];
@@ -120,14 +120,14 @@ final class ReportController
         foreach ($r['topLocations'] as $x) {
             yield ['Repeat locations', $x['department'] . ', ' . $x['location'], (int) $x['n']];
         }
-        yield ['Technicians', 'Technician', 'Resolved', 'Within SLA', 'Avg resolution (min)', 'Open now'];
+        yield ['Technicians', 'Technician', 'Resolved', 'On time', 'Average fix time (min)', 'Open now'];
         foreach ($r['technicians'] as $x) {
             yield ['Technicians', $x['full_name'], (int) $x['resolved'], $pct($x['sla_pct']),
                    $x['avg_resolution'] === null ? '' : (int) round((float) $x['avg_resolution']), (int) $x['open_now']];
         }
-        yield ['Open backlog (now)', 'Age', 'Tickets'];
+        yield ['Still open (now)', 'Age', 'Tickets'];
         foreach ($r['backlog']['ages'] as $label => $n) {
-            yield ['Open backlog (now)', $label, $n];
+            yield ['Still open (now)', $label, $n];
         }
         foreach ($r['backlog']['oldest'] as $x) {
             yield ['Oldest open', $x['ref'], $x['title'], $x['priority_name'], TicketMeta::STATUSES[$x['status']]['label'], $x['created_at'], $x['assignee_name'] ?? 'Unassigned'];
