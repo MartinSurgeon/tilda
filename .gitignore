@@ -9,3 +9,5 @@
 .DS_Store
 Thumbs.db
 vendor.zip
+update.zip
+.gitignore

@@ -8,24 +8,22 @@ use App\Core\Router;
 use App\Core\SecurityHeaders;
 use App\Core\Session;
 
-try {
-    // PHP built-in dev server: let it serve real files (css, js, images) directly.
-    if (PHP_SAPI === 'cli-server') {
-        $file = __DIR__ . parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-        if ($file !== __FILE__ && is_file($file)) {
-            return false;
-        }
+// PHP built-in dev server: let it serve real files (css, js, images) directly.
+if (PHP_SAPI === 'cli-server') {
+    $file = __DIR__ . parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+    if ($file !== __FILE__ && is_file($file)) {
+        return false;
     }
+}
 
+try {
+    // Only bootstrap is wrapped: this is the one phase that can fail before
+    // ErrorHandler::register() (its last line) exists to catch anything.
+    // Once bootstrap succeeds, every error below — including the routine
+    // HttpException a route throws for 403/404/419 — must reach that
+    // registered handler instead of being swallowed here, or it renders as
+    // a raw "Application Error" dump instead of the proper error page.
     require dirname(__DIR__) . '/app/bootstrap.php';
-
-    SecurityHeaders::send();
-    Session::start();
-    DB::setContext(Auth::id(), Request::ip(), Request::userAgent());
-
-    $router = new Router();
-    require BASE_PATH . '/config/routes.php';
-    $router->dispatch();
 } catch (\Throwable $e) {
     http_response_code(500);
     header('Content-Type: text/html; charset=utf-8');
@@ -43,3 +41,11 @@ try {
         . '</div></body></html>';
     exit;
 }
+
+SecurityHeaders::send();
+Session::start();
+DB::setContext(Auth::id(), Request::ip(), Request::userAgent());
+
+$router = new Router();
+require BASE_PATH . '/config/routes.php';
+$router->dispatch();
