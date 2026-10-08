@@ -11,6 +11,19 @@ $tone = static fn (string $a) => match (true) {
     str_starts_with($a, 'auth.') || str_starts_with($a, 'account.') => 'badge-midnight',
     default => 'badge-neutral',
 };
+/** Nested metadata as dotted "filters.month" => "2026-10" pairs. */
+$flatten = static function (array $data, string $prefix = '') use (&$flatten): array {
+    $out = [];
+    foreach ($data as $k => $v) {
+        $key = $prefix === '' ? (string) $k : $prefix . '.' . $k;
+        if (is_array($v)) {
+            $out += $v === [] ? [$key => '—'] : $flatten($v, $key);
+        } else {
+            $out[$key] = is_bool($v) ? ($v ? 'true' : 'false') : (string) ($v ?? '—');
+        }
+    }
+    return $out;
+};
 ?>
 <form method="get" action="<?= e(url('/audit')) ?>" class="card card-body mb-5 space-y-4" role="search">
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -87,10 +100,19 @@ $tone = static fn (string $a) => match (true) {
                             · <?= e($r['ip_address'] ?? '—') ?>
                         </p>
                         <?php if ($meta): ?>
-                            <details class="mt-1">
-                                <summary class="inline-flex min-h-touch cursor-pointer items-center text-sm font-semibold text-midnight">Details</summary>
-                                <pre class="mt-1 overflow-x-auto whitespace-pre-wrap break-all rounded-lg bg-smoke-2 p-3 text-xs text-ink"><?= e(json_encode($meta, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)) ?></pre>
-                                <p class="mt-1 break-all text-xs text-muted">Entry #<?= (int) $r['id'] ?> · fingerprint <?= e(substr($r['row_hash'], 0, 16)) ?>…</p>
+                            <details class="group mt-1">
+                                <summary class="inline-flex min-h-touch cursor-pointer list-none items-center gap-1 text-sm font-medium text-muted hover:text-ink">
+                                    Details <?= icon('chevron-down', 'h-4 w-4 transition-transform duration-150 group-open:rotate-180') ?>
+                                </summary>
+                                <div class="mt-1 rounded-lg border border-line bg-smoke-2 p-3">
+                                    <dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
+                                        <?php foreach ($flatten($meta) as $k => $v): ?>
+                                            <dt class="font-mono text-xs text-muted"><?= e($k) ?></dt>
+                                            <dd class="min-w-0 break-words text-ink"><?= e($v) ?></dd>
+                                        <?php endforeach; ?>
+                                    </dl>
+                                    <p class="mt-3 break-all border-t border-line pt-2 font-mono text-xs text-muted">Entry #<?= (int) $r['id'] ?> · fingerprint <?= e(substr($r['row_hash'], 0, 16)) ?>…</p>
+                                </div>
                             </details>
                         <?php endif; ?>
                     </div>
